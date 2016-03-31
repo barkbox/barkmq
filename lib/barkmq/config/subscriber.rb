@@ -24,6 +24,16 @@ module BarkMQ
         yield @middleware if block_given?
         @middleware
       end
+
+      def handlers
+        @handlers ||= {}
+        @handlers
+      end
+
+      def add_handler handler_class, options={}
+        topic_name = options[:topic].to_sym
+        handlers[topic_name] = handler_class
+      end
     end
 
   end

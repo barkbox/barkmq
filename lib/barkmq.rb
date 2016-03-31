@@ -68,7 +68,7 @@ module BarkMQ
         c.error_handler = proc do |error|
           logger.error "BarkMQ publisher error=#{error.inspect}"
           $statsd.increment("message.publisher.error", tags: [ ])
-          $statsd.event("Circuitry publisher error.",
+          $statsd.event("BarkMQ publisher error.",
                         "error=#{error.inspect}\n",
                         alert_type: 'error',
                         tags: [ "category:message_queue" ])
@@ -82,9 +82,21 @@ module BarkMQ
       @_pub_config
     end
 
-    def subscribe(options={}, &block)
+    def subscribe!(options={}, &block)
+      logger = options[:logger] || Logger.new(STDOUT)
       Circuitry.subscribe(options) do |message, topic_name|
-        logger.info "topic_name=#{topic_name.inspect} message=#{message.inspect}"
+        if Rails.env.dev? || Rails.env.development?
+          logger.info "Received. topic_name=#{topic_name.inspect} message=#{message.inspect}"
+        else
+          logger.info "Received. topic_name=#{topic_name.inspect}"
+        end
+
+        if @_sub_config.handlers[topic_name.to_sym]
+          logger.info "handler=#{@_sub_config.handlers[topic_name.to_sym].inspect} " +
+                      "topic_name=#{topic_name.inspect} " +
+                      "message=#{message.inspect}"
+          @_sub_config.handlers[topic_name.to_sym].new(topic_name, message).call
+        end
       end
     end
 

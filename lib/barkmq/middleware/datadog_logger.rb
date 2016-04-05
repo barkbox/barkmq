@@ -1,18 +1,19 @@
 module BarkMQ
   module Middleware
     class DatadogLogger
-      attr_reader :namespace, :logger
+      attr_reader :namespace, :logger, :statsd
 
-      def initialize(namespace: '', logger: Logger.new(STDOUT))
+      def initialize(namespace: '', logger: Logger.new(STDOUT), statsd: Statsd.new)
         self.namespace = namespace
         self.logger = logger
+        self.statsd = statsd
       end
 
       def call(topic, message)
         start_time = Time.now
         logger.info("metric=#{start_metric.inspect} topic=#{topic.inspect} start_time=#{start_time.inspect}")
         unless start_metric.blank?
-          $statsd.increment(start_metric, tags: [ "topic:#{topic}" ])
+          statsd.increment(start_metric, tags: [ "topic:#{topic}" ])
         end
         yield
       ensure
@@ -20,8 +21,8 @@ module BarkMQ
         response_time = ((end_time - start_time) * 1000).to_i
         logger.info("metric=#{end_metric.inspect} topic=#{topic.inspect} response_time=#{response_time.inspect}ms")
         unless end_metric.blank?
-          $statsd.increment(end_metric, tags: [ "topic:#{topic}" ])
-          $statsd.gauge(time_metric, response_time, tags: [ "topic:#{topic}" ])
+          statsd.increment(end_metric, tags: [ "topic:#{topic}" ])
+          statsd.gauge(time_metric, response_time, tags: [ "topic:#{topic}" ])
         end
       end
 
@@ -60,7 +61,7 @@ module BarkMQ
 
       private
 
-      attr_writer :namespace, :logger
+      attr_writer :namespace, :logger, :statsd
     end
   end
 end

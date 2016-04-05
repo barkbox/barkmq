@@ -8,12 +8,15 @@ require 'barkmq/frameworks/active_record' if defined?(Rails) && Rails::VERSION::
 require 'barkmq/version'
 
 module BarkMQ
+  class HandlerNotFound < StandardError; end
+
   class << self
 
     def subscriber_config(&block)
       @_sub_config ||= Config::Subscriber.new
       yield @_sub_config if block_given?
       logger = @_sub_config.logger
+      statsd = @_sub_config.statsd
       Circuitry.subscriber_config do |c|
         c.queue_name = @_sub_config.queue_name
         c.dead_letter_queue_name = @_sub_config.dead_letter_queue_name
@@ -25,12 +28,11 @@ module BarkMQ
         c.logger = @_sub_config.logger
         c.error_handler = proc do |error|
           logger.error "BarkMQ subscriber error=#{error.inspect}"
-          $statsd.increment("message.subscriber.error", tags: [ ])
-          $statsd.event("Circuitry subscriber error.",
-                        "error=#{error.inspect}\n",
-                        alert_type: 'error',
-                        tags: [ "category:message_queue" ])
-          # Circuitry.flush
+          statsd.increment("message.subscriber.error", tags: [ ])
+          statsd.event("BarkMQ subscriber error.",
+                       "error=#{error.inspect}\n",
+                       alert_type: 'error',
+                       tags: [ "category:message_queue" ])
         end
         c.lock_strategy = Circuitry::Locks::Redis.new(client: Redis.new)
         c.async_strategy = :thread
@@ -56,6 +58,7 @@ module BarkMQ
       @_pub_config ||= Config::Publisher.new
       yield @_pub_config if block_given?
       logger = @_pub_config.logger
+      statsd = @_pub_config.statsd
       Circuitry.publisher_config do |c|
         c.access_key = @_pub_config.access_key
         c.secret_key = @_pub_config.secret_key
@@ -67,11 +70,11 @@ module BarkMQ
 
         c.error_handler = proc do |error|
           logger.error "BarkMQ publisher error=#{error.inspect}"
-          $statsd.increment("message.publisher.error", tags: [ ])
-          $statsd.event("BarkMQ publisher error.",
-                        "error=#{error.inspect}\n",
-                        alert_type: 'error',
-                        tags: [ "category:message_queue" ])
+          statsd.increment("message.publisher.error", tags: [ ])
+          statsd.event("BarkMQ publisher error.",
+                       "error=#{error.inspect}\n",
+                       alert_type: 'error',
+                       tags: [ "category:message_queue" ])
           Circuitry.flush
         end
 
@@ -94,7 +97,7 @@ module BarkMQ
           @_sub_config.handlers[topic_name.to_sym].new(topic_name, message).call
         else
           logger.error "BarkMQ. Handler not found for topic=#{topic_name.inspect}"
-          raise 'HandlerNotFound'
+          raise HandlerNotFound
         end
       end
     end

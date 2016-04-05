@@ -11,6 +11,7 @@ module BarkMQ
         base.attribute :region, String, default: ENV['AWS_REGION'] || 'us-east-1'
         base.attribute :logger, Logger, default: Logger.new(STDERR)
         base.attribute :topic_names, Set, default: Set.new
+        base.attribute :statsd, Statsd, default: Statsd.new
       end
 
       def add_topic(model, event)

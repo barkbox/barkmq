@@ -44,6 +44,18 @@ RSpec.describe 'BarkMQ::Publisher' do
   end
 
   describe '.publish_to_sns' do
+    it 'PORO with no options' do
+      class NewPublisher
+        include BarkMQ::Publisher
+
+        def serializable_hash
+          { id: 1, message: 'test' }
+        end
+      end
+      @publisher = NewPublisher.new
+      expect(BarkMQ).to receive(:publish).with('test-barkmq-tested', { id: 1, message: 'test' }, anything)
+      @publisher.publish_to_sns('tested')
+    end
   end
 
 end

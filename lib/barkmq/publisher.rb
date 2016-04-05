@@ -6,6 +6,9 @@ module BarkMQ
     end
 
     module ClassMethods
+      attr_reader :message_serializer
+
+      attr_writer :message_serializer
     end
 
     module InstanceMethods
@@ -27,20 +30,24 @@ module BarkMQ
         ].flatten.compact.join('-')
       end
 
+      def serialized_object options={}
+        if self.class.message_serializer.present?
+          self.class.message_serializer.new(self)
+        else
+          self.serializable_hash.merge(options)
+        end
+      end
+
       def publish_to_sns event='created', options={}
         topic_name = topic(event)
-        if self.message_serializer.present?
-          obj = self.message_serializer.new(self)
-        else
-          obj = self.serializable_hash.merge(options)
-        end
+        obj = serialized_object(options)
         BarkMQ.publish(topic_name, obj, async: true, timeout: 20)
       rescue Aws::SNS::Errors::NotFound => e
         BarkMQ.pub_config.logger.error "SNS topic not found topic_name=#{topic_name.inspect}"
-        $statsd.event("SNS topic not found.",
-                      "topic_name=#{topic_name}\n",
-                      alert_type: 'error',
-                      tags: [ "category:message_queue" ])
+        BarkMQ.pub_config.statsd.event("SNS topic not found.",
+                                       "topic_name=#{topic_name}\n",
+                                       alert_type: 'error',
+                                       tags: [ "category:message_queue" ])
       end
 
     end

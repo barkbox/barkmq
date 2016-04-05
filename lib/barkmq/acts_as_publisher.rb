@@ -9,8 +9,6 @@ module BarkMQ
       def acts_as_publisher(options = {})
         send :include, InstanceMethods
 
-        cattr_accessor :message_serializer
-
         after_commit :after_create_publish, on: :create
         after_commit :after_update_publish, on: :update
         after_commit :after_destroy_publish, on: :destroy

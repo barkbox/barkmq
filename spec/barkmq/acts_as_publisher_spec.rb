@@ -66,4 +66,8 @@ RSpec.describe 'BarkMQ::ActsAsPublisher' do
     end
 
   end
+
+  describe '.after_create_publish' do
+    
+  end
 end

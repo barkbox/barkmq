@@ -30,8 +30,12 @@ module BarkMQ
         @handlers
       end
 
+      def clear_handlers
+        @handlers = {}
+      end
+
       def add_handler handler_class, options={}
-        topic_name = options[:topic].to_sym
+        topic_name = options[:topic].to_s
         handlers[topic_name] = handler_class
       end
     end

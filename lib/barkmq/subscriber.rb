@@ -14,15 +14,13 @@ module BarkMQ
         self.subscriber_options ||= options
         BarkMQ.subscriber_config do |c|
           topics.each do |topic|
-            c.topic_names.add(topic)
-            c.add_handler ShipmentShippedWorker, topic: topic
+            unless c.topic_names.include?(topic)
+              c.topic_names << topic
+            end
+            c.add_handler self, topic: topic
           end
         end
       end
-
-    end
-
-    module InstanceMethods
 
     end
   end

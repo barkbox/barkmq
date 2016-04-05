@@ -1,3 +1,5 @@
+require 'statsd'
+
 module BarkMQ
   class ConfigError < StandardError; end
 
@@ -10,13 +12,15 @@ module BarkMQ
         base.attribute :secret_key, String, default: ENV['AWS_SECRET_ACCESS_KEY']
         base.attribute :region, String, default: ENV['AWS_REGION'] || 'us-east-1'
         base.attribute :logger, Logger, default: Logger.new(STDERR)
-        base.attribute :topic_names, Set, default: Set.new
+        base.attribute :topic_names, Array, default: []
         base.attribute :statsd, Statsd, default: Statsd.new
       end
 
       def add_topic(model, event)
         topic_name = [env, app_name, model, event].flatten.join('-')
-        topic_names.add(topic_name)
+        unless topic_names.include?(topic_name)
+          topic_names << topic_name
+        end
       end
     end
 

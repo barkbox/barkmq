@@ -12,10 +12,10 @@ module BarkMQ
       @_sub_config ||= Config::Subscriber.new
       yield @_sub_config if block_given?
       logger = @_sub_config.logger
-      logger.info "BarkMQ subscriber_config " +
-                  "app_name=#{@_sub_config.app_name.inspect} " +
-                  "queue_name=#{@_sub_config.queue_name.inspect} " +
-                  "topic_names=#{@_sub_config.topic_names.inspect} "
+      # logger.info "BarkMQ subscriber_config " +
+      #             "app_name=#{@_sub_config.app_name.inspect} " +
+      #             "queue_name=#{@_sub_config.queue_name.inspect} " +
+      #             "topic_names=#{@_sub_config.topic_names.inspect} "
       Circuitry.subscriber_config do |c|
         c.queue_name = @_sub_config.queue_name
         c.dead_letter_queue_name = @_sub_config.dead_letter_queue_name
@@ -53,9 +53,9 @@ module BarkMQ
       @_pub_config ||= Config::Publisher.new
       yield @_pub_config if block_given?
       logger = @_pub_config.logger
-      logger.info "BarkMQ publisher_config " +
-                  "app_name=#{@_pub_config.app_name.inspect} " +
-                  "topic_names=#{@_pub_config.topic_names.inspect} "
+      # logger.info "BarkMQ publisher_config " +
+      #             "app_name=#{@_pub_config.app_name.inspect} " +
+      #             "topic_names=#{@_pub_config.topic_names.inspect} "
       Circuitry.publisher_config do |c|
         c.access_key = @_pub_config.access_key
         c.secret_key = @_pub_config.secret_key

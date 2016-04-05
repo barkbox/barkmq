@@ -60,8 +60,8 @@ module BarkMQ
 
       def topic event
         [
-          BarkMQ.publisher_config.env,
-          BarkMQ.publisher_config.app_name,
+          BarkMQ.pub_config.env,
+          BarkMQ.pub_config.app_name,
           self.class.model_name.param_key,
           event
         ].flatten.join('-')
@@ -76,7 +76,7 @@ module BarkMQ
         end
         BarkMQ.publish(topic_name, obj, async: true, timeout: 20)
       rescue Aws::SNS::Errors::NotFound => e
-        BarkMQ.publisher_config.logger.error "SNS topic not found topic_name=#{topic_name.inspect}"
+        BarkMQ.pub_config.logger.error "SNS topic not found topic_name=#{topic_name.inspect}"
         $statsd.event("SNS topic not found.",
                       "topic_name=#{topic_name}\n",
                       alert_type: 'error',

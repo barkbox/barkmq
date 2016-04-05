@@ -96,8 +96,8 @@ module BarkMQ
     def subscribe!(options={}, &block)
       logger = options[:logger] || @_sub_config.logger
       Circuitry.subscribe(options) do |message, topic_name|
-        if @_sub_config.handlers[topic_name.to_sym]
-          @_sub_config.handlers[topic_name.to_sym].new(topic_name, message).call
+        if @_sub_config.handlers[topic_name.to_s]
+          @_sub_config.handlers[topic_name.to_s].new(topic_name, message).call
         else
           logger.error "BarkMQ. Handler not found for topic=#{topic_name.inspect}"
           raise HandlerNotFound

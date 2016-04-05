@@ -1,8 +1,9 @@
 require 'circuitry'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
-require 'barkmq/frameworks/active_record' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'
+require 'barkmq/subscriber'
+require 'barkmq/frameworks/active_record' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/version'
 
 module BarkMQ
@@ -28,7 +29,7 @@ module BarkMQ
                         "error=#{error.inspect}\n",
                         alert_type: 'error',
                         tags: [ "category:message_queue" ])
-          Circuitry.flush
+          # Circuitry.flush
         end
         c.lock_strategy = Circuitry::Locks::Redis.new(client: Redis.new)
         c.async_strategy = :thread
@@ -90,6 +91,9 @@ module BarkMQ
       Circuitry.subscribe(options) do |message, topic_name|
         if @_sub_config.handlers[topic_name.to_sym]
           @_sub_config.handlers[topic_name.to_sym].new(topic_name, message).call
+        else
+          logger.error "BarkMQ. Handler not found for topic=#{topic_name.inspect}"
+          raise 'HandlerNotFound'
         end
       end
     end

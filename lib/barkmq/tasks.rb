@@ -3,6 +3,8 @@ namespace :barkmq do
   task setup: :environment do
     require 'circuitry/provisioning'
 
+    Rails.application.eager_load! if defined?(Rails)
+
     logger = Logger.new(STDOUT)
     logger.level = Logger::INFO
 
@@ -24,6 +26,7 @@ namespace :barkmq do
       ENV['DATABASE_URL'] = "#{database_url}?pool=#{pool_size}"
       ActiveRecord::Base.establish_connection if defined?(Rails)
     end
+    Rails.application.eager_load! if defined?(Rails)
     BarkMQ.subscribe!(options)
   end
 end

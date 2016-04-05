@@ -2,6 +2,7 @@ require 'circuitry'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'
+require 'barkmq/middleware/datadog_logger'
 require 'barkmq/subscriber'
 require 'barkmq/frameworks/active_record' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/version'

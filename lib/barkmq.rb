@@ -22,6 +22,7 @@ module BarkMQ
         c.dead_letter_queue_name = @_sub_config.dead_letter_queue_name
         c.topic_names = @_sub_config.topic_names
         c.max_receive_count = 8
+        c.visibility_timeout = 30
         c.access_key = @_sub_config.access_key
         c.secret_key = @_sub_config.secret_key
         c.region = @_sub_config.region

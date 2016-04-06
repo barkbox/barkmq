@@ -4,3 +4,5 @@ machine:
 test:
   override:
     - bundle exec rspec
+database:
+  override:

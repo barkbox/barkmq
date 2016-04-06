@@ -67,7 +67,49 @@ RSpec.describe 'BarkMQ::ActsAsPublisher' do
 
   end
 
-  describe '.after_create_publish' do
-    
+  describe 'create active record model' do
+
+    it 'calls after_create_publish and after_create_callback' do
+      class NewArPublisher < ActiveRecord::Base
+        acts_as_publisher
+      end
+      @publisher_record = NewArPublisher.new
+      expect(@publisher_record).to receive(:after_create_publish).and_call_original
+      expect(@publisher_record).to receive(:publish_to_sns)
+      expect(@publisher_record).to receive(:after_create_callback)
+      @publisher_record.save!
+    end
+
+  end
+
+  describe '.after_update_publish' do
+
+    it 'calls after_update_publish and after_update_callback' do
+      class NewArPublisher < ActiveRecord::Base
+        acts_as_publisher
+      end
+      @publisher_record = NewArPublisher.create!
+      expect(@publisher_record).to receive(:after_update_publish).and_call_original
+      expect(@publisher_record).to receive(:publish_to_sns)
+      expect(@publisher_record).to receive(:after_update_callback)
+      @publisher_record.event = 'update'
+      @publisher_record.save!
+    end
+
+  end
+
+  describe '.after_destroy_publish' do
+
+    it 'calls after_destroy_publish and after_destroy_callback' do
+      class NewArPublisher < ActiveRecord::Base
+        acts_as_publisher
+      end
+      @publisher_record = NewArPublisher.create!
+      expect(@publisher_record).to receive(:after_destroy_publish).and_call_original
+      expect(@publisher_record).to receive(:publish_to_sns)
+      expect(@publisher_record).to receive(:after_destroy_callback)
+      @publisher_record.destroy
+    end
+
   end
 end

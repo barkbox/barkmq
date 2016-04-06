@@ -36,5 +36,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "redis"
   spec.add_development_dependency "activerecord", "~> 3.0"
   spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "test_after_commit"
 
 end

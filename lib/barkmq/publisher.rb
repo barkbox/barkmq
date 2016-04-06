@@ -6,9 +6,7 @@ module BarkMQ
     end
 
     module ClassMethods
-      attr_reader :message_serializer
-
-      attr_writer :message_serializer
+      attr_accessor :message_serializer
     end
 
     module InstanceMethods

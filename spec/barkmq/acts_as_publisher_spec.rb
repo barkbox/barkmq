@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe 'BarkMQ::ActsAsPublisher' do
+RSpec.describe BarkMQ::ActsAsPublisher do
 
   describe '.acts_as_publisher' do
 

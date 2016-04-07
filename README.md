@@ -56,7 +56,7 @@ By default the create, update, and destroy events are enabled.
 
 The create, update, and destroy events also fire a callback where custom logic can be entered. The callback methods will be named `after_<event>_callback`.
 
-To add custom events add the event name to the events param. The topic names will be named `<topic_prefix>-<event>`.
+To add custom events add the event name to the events param. The topic names will be named `<topic_prefix>-<model_name>-<event>`.
 
 You can specify a custom serializer by passing a ActiveSerializer object as a `serializer` argument.
 
@@ -83,7 +83,7 @@ To create a worker that listens to a specific SNS topic include `BarkMQ::Subscri
 
 The `perform` method must be implemented as show below or an exception will be triggered.
 
-The execution is synchronous so if it's time intensive pass it off to a delayed worker.
+The execution is synchronous so if it's time intensive pass it off to a delayed worker. By default the execution timeout is 30 seconds.
 
 ```ruby
 class UserRegisteredWorker

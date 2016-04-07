@@ -11,7 +11,7 @@ module BarkMQ
 
       def call error
         logger.error "BarkMQ #{namespace} error=#{error.inspect}"
-        statsd.increment("barkmq.message.#{namespace}.error", tags: [ ])
+        statsd.increment("barkmq.message.#{namespace}.error", tags: [ "category:#{namespace}" ])
         statsd.event("BarkMQ #{namespace} error.",
                      "error=#{error.inspect}\n",
                      alert_type: 'error',

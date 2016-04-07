@@ -13,6 +13,7 @@ module BarkMQ
         base.attribute :topic_prefix, String, default: 'dev-unknown'
         base.attribute :topic_names, Array, default: []
         base.attribute :statsd, Statsd, default: Statsd.new
+        base.attribute :error_handler
       end
 
       def add_topic(model, event)

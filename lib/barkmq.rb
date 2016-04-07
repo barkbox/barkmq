@@ -2,6 +2,7 @@ require 'circuitry'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'
+require 'barkmq/handlers/default_error'
 require 'barkmq/middleware/datadog_logger'
 require 'barkmq/subscriber'
 require 'barkmq/publisher'
@@ -29,14 +30,8 @@ module BarkMQ
         c.secret_key = @_sub_config.secret_key
         c.region = @_sub_config.region
         c.logger = @_sub_config.logger
-        c.error_handler = proc do |error|
-          logger.error "BarkMQ subscriber error=#{error.inspect}"
-          statsd.increment("barkmq.message.subscriber.error", tags: [ ])
-          statsd.event("BarkMQ subscriber error.",
-                       "error=#{error.inspect}\n",
-                       alert_type: 'error',
-                       tags: [ "category:message_queue" ])
-        end
+        c.error_handler = @_sub_config.error_handler
+
         c.lock_strategy = Circuitry::Locks::Redis.new(client: Redis.new)
         c.async_strategy = :thread
         c.on_async_exit = proc do
@@ -70,16 +65,7 @@ module BarkMQ
 
         c.async_strategy = :thread
         c.topic_names = @_pub_config.topic_names
-
-        c.error_handler = proc do |error|
-          logger.error "BarkMQ publisher error=#{error.inspect}"
-          statsd.increment("barkmq.message.publisher.error", tags: [ ])
-          statsd.event("BarkMQ publisher error.",
-                       "error=#{error.inspect}\n",
-                       alert_type: 'error',
-                       tags: [ "category:message_queue" ])
-          Circuitry.flush
-        end
+        c.error_handler = @_sub_config.error_handler
 
         @_pub_config.middleware.entries.each do |entry|
           c.middleware.add(entry.klass, *entry.args)

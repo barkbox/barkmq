@@ -21,7 +21,7 @@ namespace :barkmq do
       batch_size: 10
     }
     database_url = ENV['DATABASE_URL']
-    pool_size = options[:batch_size] || 10
+    pool_size = ENV['BARKMQ_POOL_SIZE'] || options[:batch_size] || 10
     if database_url
       ENV['DATABASE_URL'] = "#{database_url}?pool=#{pool_size}"
       ActiveRecord::Base.establish_connection if defined?(Rails)

@@ -39,7 +39,7 @@ RSpec.describe BarkMQ::Middleware::DatadogLogger do
       let(:block) { ->{ raise StandardError, 'test failure' } }
 
       it 'raises the error' do
-        expect { call }.to raise_error
+        expect { call }.to raise_error(StandardError)
       end
     end
   end

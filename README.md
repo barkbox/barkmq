@@ -19,14 +19,20 @@ Or install it yourself as:
 
 
 ## Configuration
-config/initializers/barkmq.rb
+
+`config/initializers/barkmq.rb`
+
 ```ruby
   statsd_client = Statsd.new('localhost', 8125, namespace: 'barkbox',
                                               tags: [ "env:#{Rails.env}" ])
   BarkMQ.publisher_config do |c|
-    c.logger = Rails.logger
-    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-')
-    c.statsd = statsd_client
+    c.access_key = 'ABCDEF' # Default: ENV['AWS_ACCESS_KEY_ID']
+    c.secret_key = '123456' # Default: ENV['AWS_SECRET_ACCESS_KEY']
+    c.region = 'us-east-1'  # Default: ENV['AWS_REGION'] or 'us-east-1'
+
+    c.logger = Rails.logger # Default: Logger.new(STDERR)
+    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-') # Default: 'dev-unknown'
+    c.statsd = statsd_client # Default: Statsd.new
 
     # Optional but recommended.
     c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
@@ -35,9 +41,13 @@ config/initializers/barkmq.rb
   end
 
   BarkMQ.subscriber_config do |c|
-    c.logger = Rails.logger
-    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-')
-    c.statsd = statsd_client
+    c.access_key = 'ABCDEF' # Default: ENV['AWS_ACCESS_KEY_ID']
+    c.secret_key = '123456' # Default: ENV['AWS_SECRET_ACCESS_KEY']
+    c.region = 'us-east-1'  # Default: ENV['AWS_REGION'] or 'us-east-1'
+
+    c.logger = Rails.logger # Default: Logger.new(STDERR)
+    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-') # Default: 'dev-unknown'
+    c.statsd = statsd_client # Default: Statsd.new
 
     # Optional but recommended.
     c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',

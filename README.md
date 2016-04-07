@@ -52,15 +52,15 @@ config/initializers/barkmq.rb
 
 ### Publisher
 
-Add acts_as_publisher to any ActiveRecord model to enable publisher capabilities.
+Add `acts_as_publisher` to any ActiveRecord model to enable publisher capabilities.
 
 By default the create, update, and destroy events are enabled.
 
-The create, update, and destroy events also fire a callback where custom logic can be entered.
+The create, update, and destroy events also fire a callback where custom logic can be entered. The callback methods will be named `after_<event>_callback`.
 
-To add custom events add the event name to the events param.
+To add custom events add the event name to the events param. The topic names will be called `<topic_prefix>-<event>`.
 
-You can specify a customer serializer by passing the serializer argument.
+You can specify a custom serializer by passing a ActiveSerializer object as a `serializer` argument.
 
 ```ruby
 class User < ActiveRecord::Base
@@ -81,9 +81,9 @@ end
 
 ### Subscriber
 
-To create a worker that listens to a specific SNS topic.
+To create a worker that listens to a specific SNS topic include `BarkMQ::Subscriber` and call the `barkmq_subscriber_options` method.
 
-The perform method must be implemented as show below or an exception will be triggered.
+The `perform` method must be implemented as show below or an exception will be triggered.
 
 The execution is synchronous so if it's time intensive pass it off to a delayed worker.
 

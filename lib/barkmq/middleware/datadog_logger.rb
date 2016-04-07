@@ -29,9 +29,9 @@ module BarkMQ
       def start_metric
         case namespace
         when 'publisher'
-          'message.publish'
+          'barkmq.message.publish'
         when 'subscriber'
-          'message.received'
+          'barkmq.message.received'
         else
           nil
         end
@@ -40,9 +40,9 @@ module BarkMQ
       def end_metric
         case namespace
         when 'publisher'
-          'message.published'
+          'barkmq.message.published'
         when 'subscriber'
-          'message.processed'
+          'barkmq.message.processed'
         else
           nil
         end
@@ -51,9 +51,9 @@ module BarkMQ
       def time_metric
         case namespace
         when 'publisher'
-          'message.publish.time'
+          'barkmq.message.publish.time'
         when 'subscriber'
-          'message.process.time'
+          'barkmq.message.process.time'
         else
           nil
         end

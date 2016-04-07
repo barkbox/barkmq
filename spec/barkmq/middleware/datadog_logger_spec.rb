@@ -15,9 +15,9 @@ RSpec.describe BarkMQ::Middleware::DatadogLogger do
       let(:block) { -> {} }
 
       it 'instrument to statsd' do
-        expect(statsd).to receive(:increment).with('message.publish', {:tags=>["topic:test_topic"]})
-        expect(statsd).to receive(:increment).with('message.published', {:tags=>["topic:test_topic"]})
-        expect(statsd).to receive(:gauge).with('message.publish.time', anything, {:tags=>["topic:test_topic"]})
+        expect(statsd).to receive(:increment).with('barkmq.message.publish', {:tags=>["topic:test_topic"]})
+        expect(statsd).to receive(:increment).with('barkmq.message.published', {:tags=>["topic:test_topic"]})
+        expect(statsd).to receive(:gauge).with('barkmq.message.publish.time', anything, {:tags=>["topic:test_topic"]})
         call
       end
     end
@@ -27,9 +27,9 @@ RSpec.describe BarkMQ::Middleware::DatadogLogger do
       let(:block) { -> {} }
 
       it 'instrument to statsd' do
-        expect(statsd).to receive(:increment).with('message.received', {:tags=>["topic:test_topic"]})
-        expect(statsd).to receive(:increment).with('message.processed', {:tags=>["topic:test_topic"]})
-        expect(statsd).to receive(:gauge).with('message.process.time', anything, {:tags=>["topic:test_topic"]})
+        expect(statsd).to receive(:increment).with('barkmq.message.received', {:tags=>["topic:test_topic"]})
+        expect(statsd).to receive(:increment).with('barkmq.message.processed', {:tags=>["topic:test_topic"]})
+        expect(statsd).to receive(:gauge).with('barkmq.message.process.time', anything, {:tags=>["topic:test_topic"]})
         call
       end
     end

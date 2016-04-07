@@ -1,7 +1,9 @@
 module BarkMQ
+  class SubscriberNotImplemented < StandardError; end
+
   module Subscriber
     def self.included(base)
-      base.extend(ClassMethods)
+      base.send :extend, ClassMethods
     end
 
     module ClassMethods
@@ -10,6 +12,8 @@ module BarkMQ
       attribute :subscriber_options, Hash
 
       def barkmq_subscriber_options(options = {})
+        send :include, InstanceMethods
+
         topics = Array(options[:topics])
         self.subscriber_options ||= options
         BarkMQ.subscriber_config do |c|
@@ -21,7 +25,12 @@ module BarkMQ
           end
         end
       end
+    end
 
+    module InstanceMethods
+      def perform topic, message
+        raise SubscriberNotImplemented
+      end
     end
   end
 end

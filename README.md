@@ -29,6 +29,7 @@ config/initializers/barkmq.rb
     c.env = Rails.env
     c.statsd = statsd_client
 
+    # Optional but recommended.
     c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
                                                         logger: Rails.logger,
                                                         statsd: statsd_client
@@ -40,6 +41,7 @@ config/initializers/barkmq.rb
     c.env = Rails.env
     c.statsd = statsd_client
 
+    # Optional but recommended.
     c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
                                                         logger: Rails.logger,
                                                         statsd: statsd_client
@@ -79,7 +81,11 @@ end
 
 ### Subscriber
 
-To create a worker that listens to a specific SNS topic. The perform action is synchronous so if it's processor intensive send it to a delayed worker.
+To create a worker that listens to a specific SNS topic.
+
+The perform method must be implemented as show below or an exception will be triggered.
+
+The execution is synchronous so if it's time intensive pass it off to a delayed worker.
 
 ```ruby
 class UserRegisteredWorker
@@ -95,12 +101,12 @@ end
 ```
 
 ### Setup
-To create the AWS SNS topics and SQS queues and the appropriate subscription relationships:
+To create the AWS SNS topics, SQS queues, and the appropriate subscription relationships:
 
     $ rake barkmq:setup
 
 ### Deployment
-To process jobs the SQS queue:
+To process jobs in the SQS queue:
 
     $ rake barkmq:work
 

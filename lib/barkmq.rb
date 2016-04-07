@@ -95,7 +95,7 @@ module BarkMQ
 
     def subscribe!(options={})
       Circuitry.subscribe(options) do |message, topic_name|
-        BarkMQ.handle_message(topic_name, message, options)
+        BarkMQ.handle_message(topic_name, message)
       end
     end
 

@@ -1,8 +1,5 @@
-# Barkmq
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/barkmq`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+# BarkMQ
+A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
 
 ## Installation
 
@@ -20,9 +17,92 @@ Or install it yourself as:
 
     $ gem install barkmq
 
+
+## Configuration
+config/initializers/barkmq.rb
+```ruby
+  statsd_client = Statsd.new('localhost', 8125, namespace: 'barkbox',
+                                              tags: [ "env:#{Rails.env}" ])
+  BarkMQ.publisher_config do |c|
+    c.logger = Rails.logger
+    c.app_name = 'barkbox'
+    c.env = Rails.env
+    c.statsd = statsd_client
+
+    c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
+                                                        logger: Rails.logger,
+                                                        statsd: statsd_client
+  end
+
+  BarkMQ.subscriber_config do |c|
+    c.logger = Rails.logger
+    c.app_name = 'barkbox'
+    c.env = Rails.env
+    c.statsd = statsd_client
+
+    c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
+                                                        logger: Rails.logger,
+                                                        statsd: statsd_client
+  end
+```
+
 ## Usage
 
-TODO: Write usage instructions here
+### Publisher
+
+Add acts_as_publisher to any ActiveRecord model to enable publisher capabilities.
+
+By default the create, update, and destroy events are enabled.
+
+The create, update, and destroy events also fire a callback where custom logic can be entered.
+
+To add custom events add the event name to the events param.
+
+You can specify a customer serializer by passing the serializer argument.
+
+```ruby
+class User < ActiveRecord::Base
+  acts_as_publisher events: [ :registered, :email_changed ],
+                    serializer: Api::V2::Internal::UserSerializer
+
+  def after_create_callback
+    self.publish_to_sns('registered')
+  end
+
+  def after_update_callback
+    if self.email.present? && self.previous_changes.key?(:email)
+      self.publish_to_sns('email_changed')
+    end
+  end
+end
+```
+
+### Subscriber
+
+To create a worker that listens to a specific SNS topic. The perform action is synchronous so if it's processor intensive send it to a delayed worker.
+
+```ruby
+class UserRegisteredWorker
+  include BarkMQ::Subscriber
+
+  barkmq_subscriber_options topics: [ "#{Rails.env}-barkbox-user-registered" ]
+
+  def perform topic, message
+    user_id = message['user']['id']
+    UserMailer.delay(queue: 'user_welcome_email').welcome_email(user_id)
+  end
+end
+```
+
+### Setup
+To create the AWS SNS topics and SQS queues and the appropriate subscription relationships:
+
+    $ rake barkmq:setup
+
+### Deployment
+To process jobs the SQS queue:
+
+    $ rake barkmq:work
 
 ## Development
 
@@ -32,5 +112,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/barkmq.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/barkbox/barkmq.

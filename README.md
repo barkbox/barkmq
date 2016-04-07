@@ -23,9 +23,9 @@ Or install it yourself as:
 `config/initializers/barkmq.rb`
 
 ```ruby
-  statsd_client = Statsd.new('localhost', 8125, namespace: 'barkbox',
-                                              tags: [ "env:#{Rails.env}" ])
+  statsd_client = Statsd.new('localhost', 8125, tags: [ "env:#{Rails.env}" ])
   topic_prefix = [ Rails.env, 'barkbox' ].join('-')
+
   BarkMQ.publisher_config do |c|
     c.access_key = 'ABCDEF' # Default: ENV['AWS_ACCESS_KEY_ID']
     c.secret_key = '123456' # Default: ENV['AWS_SECRET_ACCESS_KEY']

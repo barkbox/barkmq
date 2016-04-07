@@ -31,7 +31,7 @@ module BarkMQ
         c.logger = @_sub_config.logger
         c.error_handler = proc do |error|
           logger.error "BarkMQ subscriber error=#{error.inspect}"
-          statsd.increment("message.subscriber.error", tags: [ ])
+          statsd.increment("barkmq.message.subscriber.error", tags: [ ])
           statsd.event("BarkMQ subscriber error.",
                        "error=#{error.inspect}\n",
                        alert_type: 'error',
@@ -73,7 +73,7 @@ module BarkMQ
 
         c.error_handler = proc do |error|
           logger.error "BarkMQ publisher error=#{error.inspect}"
-          statsd.increment("message.publisher.error", tags: [ ])
+          statsd.increment("barkmq.message.publisher.error", tags: [ ])
           statsd.event("BarkMQ publisher error.",
                        "error=#{error.inspect}\n",
                        alert_type: 'error',

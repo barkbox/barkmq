@@ -25,13 +25,14 @@ Or install it yourself as:
 ```ruby
   statsd_client = Statsd.new('localhost', 8125, namespace: 'barkbox',
                                               tags: [ "env:#{Rails.env}" ])
+  topic_prefix = [ Rails.env, 'barkbox' ].join('-')
   BarkMQ.publisher_config do |c|
     c.access_key = 'ABCDEF' # Default: ENV['AWS_ACCESS_KEY_ID']
     c.secret_key = '123456' # Default: ENV['AWS_SECRET_ACCESS_KEY']
     c.region = 'us-east-1'  # Default: ENV['AWS_REGION'] or 'us-east-1'
 
     c.logger = Rails.logger # Default: Logger.new(STDERR)
-    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-') # Default: 'dev-unknown'
+    c.topic_prefix = topic_prefix # Default: 'dev-unknown'
     c.statsd = statsd_client # Default: Statsd.new
 
     # Optional but recommended.
@@ -46,7 +47,7 @@ Or install it yourself as:
     c.region = 'us-east-1'  # Default: ENV['AWS_REGION'] or 'us-east-1'
 
     c.logger = Rails.logger # Default: Logger.new(STDERR)
-    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-') # Default: 'dev-unknown'
+    c.topic_prefix = topic_prefix # Default: 'dev-unknown'
     c.statsd = statsd_client # Default: Statsd.new
 
     # Optional but recommended.

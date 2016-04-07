@@ -36,6 +36,10 @@ Or install it yourself as:
     c.statsd = statsd_client # Default: Statsd.new
 
     # Optional but recommended.
+    c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'publisher',
+                                                         logger: Rails.logger,
+                                                         statsd: statsd_client
+
     c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
                                                         logger: Rails.logger,
                                                         statsd: statsd_client
@@ -51,6 +55,10 @@ Or install it yourself as:
     c.statsd = statsd_client # Default: Statsd.new
 
     # Optional but recommended.
+    c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'subscriber',
+                                                         logger: Rails.logger,
+                                                         statsd: statsd_client
+
     c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
                                                         logger: Rails.logger,
                                                         statsd: statsd_client

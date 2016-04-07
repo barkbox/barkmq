@@ -14,8 +14,8 @@ describe BarkMQ, type: :model do
 
     it 'accepts a block' do
       expect {
-        subject.send(method) { |c| c.app_name = 'foo' }
-      }.to change { subject.send(method).app_name }.to('foo')
+        subject.send(method) { |c| c.topic_prefix = 'foo' }
+      }.to change { subject.send(method).topic_prefix }.to('foo')
     end
   end
 

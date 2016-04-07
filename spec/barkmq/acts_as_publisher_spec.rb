@@ -6,8 +6,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
 
     before do
       BarkMQ.publisher_config do |c|
-        c.env = 'test'
-        c.app_name = 'barkmq'
+        c.topic_prefix = 'test-barkmq'
         c.topic_names = []
       end
     end

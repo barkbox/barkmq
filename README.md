@@ -25,8 +25,7 @@ config/initializers/barkmq.rb
                                               tags: [ "env:#{Rails.env}" ])
   BarkMQ.publisher_config do |c|
     c.logger = Rails.logger
-    c.app_name = 'barkbox'
-    c.env = Rails.env
+    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-')
     c.statsd = statsd_client
 
     # Optional but recommended.
@@ -37,8 +36,7 @@ config/initializers/barkmq.rb
 
   BarkMQ.subscriber_config do |c|
     c.logger = Rails.logger
-    c.app_name = 'barkbox'
-    c.env = Rails.env
+    c.topic_prefix = [ Rails.env, 'barkbox' ].join('-')
     c.statsd = statsd_client
 
     # Optional but recommended.
@@ -58,7 +56,7 @@ By default the create, update, and destroy events are enabled.
 
 The create, update, and destroy events also fire a callback where custom logic can be entered. The callback methods will be named `after_<event>_callback`.
 
-To add custom events add the event name to the events param. The topic names will be called `<topic_prefix>-<event>`.
+To add custom events add the event name to the events param. The topic names will be named `<topic_prefix>-<event>`.
 
 You can specify a custom serializer by passing a ActiveSerializer object as a `serializer` argument.
 

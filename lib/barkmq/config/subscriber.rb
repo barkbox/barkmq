@@ -12,11 +12,11 @@ module BarkMQ
       attribute :dead_letter_queue_name, String
 
       def queue_name
-        super || "#{env}-#{app_name}"
+        super || "#{topic_prefix}"
       end
 
       def dead_letter_queue_name
-        super || "#{env}-#{app_name}-failures"
+        super || "#{topic_prefix}-failures"
       end
 
       def middleware

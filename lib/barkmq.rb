@@ -65,7 +65,7 @@ module BarkMQ
 
         c.async_strategy = :thread
         c.topic_names = @_pub_config.topic_names
-        c.error_handler = @_sub_config.error_handler
+        c.error_handler = @_pub_config.error_handler
 
         @_pub_config.middleware.entries.each do |entry|
           c.middleware.add(entry.klass, *entry.args)

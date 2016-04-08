@@ -31,12 +31,19 @@ module BarkMQ
       end
 
       def add_publish_callback method, options={}
-        event = options[:event] || method.to_s
+        options[:on] ||= [ :create, :update, :destroy ]
+        options[:on] = Array(options[:on])
+        options[:event] ||= method.to_s
+
         BarkMQ.publisher_config do |c|
-          c.add_topic(self.model_name.param_key, event)
+          c.add_topic(self.model_name.param_key, options[:event])
         end
-        self.publish_callbacks[__callee__.to_sym] ||= [ ]
-        self.publish_callbacks[__callee__.to_sym] << [ method, options ]
+
+        options[:on].each do |action|
+          hook = [ __callee__, 'on', action ].join('_').to_sym
+          self.publish_callbacks[hook] ||= [ ]
+          self.publish_callbacks[hook] << [ method, options ]
+        end
       end
 
       alias_method :after_publish, :add_publish_callback
@@ -44,7 +51,7 @@ module BarkMQ
 
     module InstanceMethods
       def run_publish_callbacks hook
-        publish_callbacks[hook.to_sym].each do |callback|
+        publish_callbacks[hook.to_sym].to_a.each do |callback|
           method = callback[0]
           options = callback[1]
           if method.is_a?(Symbol) && self.respond_to?(method)
@@ -58,17 +65,17 @@ module BarkMQ
 
       def after_create_publish
         self.publish_to_sns('created')
-        self.run_publish_callbacks(:after_publish)
+        self.run_publish_callbacks(:after_publish_on_create)
       end
 
       def after_update_publish
         self.publish_to_sns('updated')
-        self.run_publish_callbacks(:after_publish)
+        self.run_publish_callbacks(:after_publish_on_update)
       end
 
       def after_destroy_publish
         self.publish_to_sns('destroyed')
-        self.run_publish_callbacks(:after_publish)
+        self.run_publish_callbacks(:after_publish_on_destroy)
       end
     end
   end

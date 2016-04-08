@@ -81,14 +81,19 @@ You can specify a custom serializer by passing a ActiveSerializer object as a `s
 
 ```ruby
 class User < ActiveRecord::Base
-  acts_as_publisher events: [ :registered, :email_changed ],
-                    serializer: Api::V2::Internal::UserSerializer
+  acts_as_publisher on: [ :create, :update ], # Optional. Default: [ :create, :update, :destroy]
+                    serializer: Api::V2::Internal::UserSerializer # Optional. Default: to_json method
 
-  def after_create_callback
+  after_publish :publish_registered, event: 'registered', # Optional. Default is method name stringify'ed
+                                     on: [ :create ] # Optional. Default: [ :create, :update, :destroy ]
+  after_publish :publish_registered, event: 'email_changed', # Optional. Default is method name stringify'ed
+                                     on: [ :create, :update ] # Optional. Default: [ :create, :update, :destroy ]
+
+  def publish_registered
     self.publish_to_sns('registered')
   end
 
-  def after_update_callback
+  def publish_email_changed
     if self.email.present? && self.previous_changes.key?(:email)
       self.publish_to_sns('email_changed')
     end

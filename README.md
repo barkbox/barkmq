@@ -73,11 +73,9 @@ Add `acts_as_publisher` to any ActiveRecord model to enable publisher capabiliti
 
 By default the create, update, and destroy events are enabled.
 
-The create, update, and destroy events also fire a callback where custom logic can be entered. The callback methods will be named `after_<event>_callback`.
-
-To add custom events add the event name to the events param. The topic names will be named `<topic_prefix>-<model_name>-<event>`.
-
 You can specify a custom serializer by passing a ActiveSerializer object as a `serializer` argument.
+
+A custom method can be executed after a successful publishing of a `created`, `update`, and `destroy` event by using the `after_publish` method. The options are `event` and `on` as shown below.
 
 ```ruby
 class User < ActiveRecord::Base

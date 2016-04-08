@@ -9,50 +9,67 @@ module BarkMQ
       def acts_as_publisher(options = {})
         send :include, InstanceMethods
 
-        after_commit :after_create_publish, on: :create
-        after_commit :after_update_publish, on: :update
-        after_commit :after_destroy_publish, on: :destroy
+        class_attribute :publish_callbacks
 
-        BarkMQ.publisher_config do |c|
-          c.add_topic(self.model_name.param_key, 'created')
-          c.add_topic(self.model_name.param_key, 'updated')
-          c.add_topic(self.model_name.param_key, 'destroyed')
+        self.publish_callbacks = {}
 
-          Array(options[:events]).each do |event|
-            c.add_topic(self.model_name.param_key, event)
+        options[:on] ||= [ :create, :update, :destroy ]
+        options[:on] = Array(options[:on])
+        event_lookup = {
+          create: 'created',
+          update: 'updated',
+          destroy: 'destroyed'
+        }
+
+        options[:on].each do |action|
+          BarkMQ.publisher_config do |c|
+            c.add_topic(self.model_name.param_key, event_lookup[action])
           end
+          after_commit "after_#{action}_publish".to_sym, on: action.to_sym
         end
-
         send("message_serializer=", options[:serializer])
       end
+
+      def add_publish_callback method, options={}
+        event = options[:event] || method.to_s
+        BarkMQ.publisher_config do |c|
+          c.add_topic(self.model_name.param_key, event)
+        end
+        self.publish_callbacks[__callee__.to_sym] ||= [ ]
+        self.publish_callbacks[__callee__.to_sym] << [ method, options ]
+      end
+
+      alias_method :after_publish, :add_publish_callback
     end
 
     module InstanceMethods
+      def run_publish_callbacks hook
+        publish_callbacks[hook.to_sym].each do |callback|
+          method = callback[0]
+          options = callback[1]
+          if method.is_a?(Symbol) && self.respond_to?(method)
+            self.send(method)
+          elsif self.respond_to?(:call)
+            method.call
+          end
+        end
+        true
+      end
 
       def after_create_publish
         self.publish_to_sns('created')
-        self.after_create_callback
+        self.run_publish_callbacks(:after_publish)
       end
 
       def after_update_publish
         self.publish_to_sns('updated')
-        self.after_update_callback
+        self.run_publish_callbacks(:after_publish)
       end
 
       def after_destroy_publish
         self.publish_to_sns('destroyed')
-        self.after_destroy_callback
+        self.run_publish_callbacks(:after_publish)
       end
-
-      def after_create_callback
-      end
-
-      def after_update_callback
-      end
-
-      def after_destroy_callback
-      end
-
     end
   end
 end

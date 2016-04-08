@@ -23,7 +23,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       expect(BarkMQ.pub_config.topic_names).to eq(expected_topics)
     end
 
-    it 'with single custom event string' do
+    it 'with single after_publish' do
       expected_topics = %W{
         test-barkmq-new_ar_publisher-created
         test-barkmq-new_ar_publisher-updated
@@ -31,20 +31,26 @@ RSpec.describe BarkMQ::ActsAsPublisher do
         test-barkmq-new_ar_publisher-tested
       }
       class NewArPublisher < ActiveRecord::Base
-        acts_as_publisher events: :tested
+        acts_as_publisher
+
+        after_publish :publish_tested, event: 'tested'
       end
       expect(BarkMQ.pub_config.topic_names).to eq(expected_topics)
     end
 
-    it 'with single custom event array' do
+    it 'with multiple after_publish' do
       expected_topics = %W{
         test-barkmq-new_ar_publisher-created
         test-barkmq-new_ar_publisher-updated
         test-barkmq-new_ar_publisher-destroyed
         test-barkmq-new_ar_publisher-tested
+        test-barkmq-new_ar_publisher-reviewed
       }
       class NewArPublisher < ActiveRecord::Base
-        acts_as_publisher events: [ :tested ]
+        acts_as_publisher
+
+        after_publish :publish_tested, event: 'tested'
+        after_publish :publish_reviewed, event: 'reviewed'
       end
       expect(BarkMQ.pub_config.topic_names).to eq(expected_topics)
     end
@@ -68,14 +74,14 @@ RSpec.describe BarkMQ::ActsAsPublisher do
 
   describe 'create active record model' do
 
-    it 'calls after_create_publish and after_create_callback' do
+    it 'calls after_create_publish and run_publish_callbacks' do
       class NewArPublisher < ActiveRecord::Base
         acts_as_publisher
       end
       @publisher_record = NewArPublisher.new
       expect(@publisher_record).to receive(:after_create_publish).and_call_original
       expect(@publisher_record).to receive(:publish_to_sns)
-      expect(@publisher_record).to receive(:after_create_callback)
+      expect(@publisher_record).to receive(:run_publish_callbacks)
       @publisher_record.save!
     end
 
@@ -90,7 +96,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       @publisher_record = NewArPublisher.create!
       expect(@publisher_record).to receive(:after_update_publish).and_call_original
       expect(@publisher_record).to receive(:publish_to_sns)
-      expect(@publisher_record).to receive(:after_update_callback)
+      expect(@publisher_record).to receive(:run_publish_callbacks)
       @publisher_record.event = 'update'
       @publisher_record.save!
     end
@@ -106,7 +112,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       @publisher_record = NewArPublisher.create!
       expect(@publisher_record).to receive(:after_destroy_publish).and_call_original
       expect(@publisher_record).to receive(:publish_to_sns)
-      expect(@publisher_record).to receive(:after_destroy_callback)
+      expect(@publisher_record).to receive(:run_publish_callbacks)
       @publisher_record.destroy
     end
 

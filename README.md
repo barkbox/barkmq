@@ -1,6 +1,6 @@
 # BarkMQ
 A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
-[Publisher](docs/publisher.md)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -98,6 +98,7 @@ class User < ActiveRecord::Base
   end
 end
 ```
+[More Publisher Details](docs/publisher.md)
 
 ### Subscriber
 
@@ -119,6 +120,7 @@ class UserRegisteredWorker
   end
 end
 ```
+[More Subscriber Details](docs/subscriber.md)
 
 ### Setup
 To create the AWS SNS topics, SQS queues, and the appropriate subscription relationships:

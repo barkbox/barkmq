@@ -1,6 +1,5 @@
-# Publisher
+# Subscriber
 
 ## Syntax
-
 
 ## Options

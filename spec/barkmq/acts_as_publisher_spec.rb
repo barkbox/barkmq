@@ -117,4 +117,59 @@ RSpec.describe BarkMQ::ActsAsPublisher do
     end
 
   end
+
+  describe '.after_publish' do
+    it 'calls error handler on error' do
+      class NewArPublisher < ActiveRecord::Base
+        acts_as_publisher
+
+        after_publish :test_method, error: :test_method_error
+
+        def test_method
+          raise 'test error'
+        end
+
+        def test_method_error error
+        end
+      end
+      @publisher_record = NewArPublisher.new
+      expect(@publisher_record).to receive(:test_method_error).with(RuntimeError)
+      @publisher_record.save
+    end
+
+    it 'calls complete handler on success' do
+      class NewArPublisher < ActiveRecord::Base
+        acts_as_publisher
+
+        after_publish :test_method, complete: :test_method_complete
+
+        def test_method
+        end
+
+        def test_method_complete
+        end
+      end
+      @publisher_record = NewArPublisher.new
+      expect(@publisher_record).to receive(:test_method_complete)
+      @publisher_record.save
+    end
+
+    it 'calls complete handler on error' do
+      class NewArPublisher < ActiveRecord::Base
+        acts_as_publisher
+
+        after_publish :test_method, complete: :test_method_complete
+
+        def test_method
+          raise 'test error'
+        end
+
+        def test_method_complete
+        end
+      end
+      @publisher_record = NewArPublisher.new
+      expect(@publisher_record).to receive(:test_method_complete)
+      @publisher_record.save
+    end
+  end
 end

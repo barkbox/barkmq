@@ -69,13 +69,7 @@ Or install it yourself as:
 
 ### Publisher
 
-Add `acts_as_publisher` to any ActiveRecord model to enable publisher capabilities.
-
-By default the create, update, and destroy events are enabled.
-
-You can specify a custom serializer by passing a ActiveSerializer object as a `serializer` argument.
-
-A custom method can be executed after a successful publishing of a `created`, `update`, and `destroy` event by using the `after_publish` method. The options are `event` and `on` as shown below.
+Call `acts_as_publisher` to any ActiveRecord model to enable publisher functionality. This will add the `publish_to_sns` convenience method that will serialize the ActiveRecord model and publish to the appropriate publish.
 
 ```ruby
 class User < ActiveRecord::Base

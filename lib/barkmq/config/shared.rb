@@ -25,10 +25,5 @@ module BarkMQ
       end
     end
 
-    def validate_setting(value, permitted_values)
-      return if permitted_values.include?(value)
-      raise ConfigError, "invalid value `#{value}`, must be one of #{permitted_values.inspect}"
-    end
-
   end
 end

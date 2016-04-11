@@ -42,7 +42,15 @@ module BarkMQ
         options[:on].each do |action|
           hook = [ __callee__, 'on', action ].join('_').to_sym
           self.publish_callbacks[hook] ||= [ ]
-          self.publish_callbacks[hook] << [ method, options ]
+          self.publish_callbacks[hook] << method
+        end
+
+        [ :error, :complete ].each do |callback|
+          if options[callback].present?
+            hook = [ __callee__, 'on', callback ].join('_').to_sym
+            self.publish_callbacks[hook] ||= [ ]
+            self.publish_callbacks[hook] << options[callback]
+          end
         end
       end
 
@@ -50,32 +58,48 @@ module BarkMQ
     end
 
     module InstanceMethods
-      def run_publish_callbacks hook
-        publish_callbacks[hook.to_sym].to_a.each do |callback|
-          method = callback[0]
-          options = callback[1]
+      def run_publish_callbacks hook, *args
+        publish_callbacks[hook.to_sym].to_a.each do |method|
           if method.is_a?(Symbol) && self.respond_to?(method)
-            self.send(method)
-          elsif self.respond_to?(:call)
-            method.call
+            args.present? ? self.send(method, *args) : self.send(method)
+          elsif method.respond_to?(:call)
+            args.present? ? method.call(*args) : method.call
           end
         end
         true
       end
 
       def after_create_publish
-        self.publish_to_sns('created')
-        self.run_publish_callbacks(:after_publish_on_create)
+        begin
+          self.publish_to_sns('created')
+          self.run_publish_callbacks(:after_publish_on_create)
+        rescue => e
+          self.run_publish_callbacks(:after_publish_on_error, e)
+        ensure
+          self.run_publish_callbacks(:after_publish_on_complete)
+        end
       end
 
       def after_update_publish
-        self.publish_to_sns('updated')
-        self.run_publish_callbacks(:after_publish_on_update)
+        begin
+          self.publish_to_sns('updated')
+          self.run_publish_callbacks(:after_publish_on_update)
+        rescue => e
+          self.run_publish_callbacks(:after_publish_on_error, e)
+        ensure
+          self.run_publish_callbacks(:after_publish_on_complete)
+        end
       end
 
       def after_destroy_publish
-        self.publish_to_sns('destroyed')
-        self.run_publish_callbacks(:after_publish_on_destroy)
+        begin
+          self.publish_to_sns('destroyed')
+          self.run_publish_callbacks(:after_publish_on_destroy)
+        rescue => e
+          self.run_publish_callbacks(:after_publish_on_error, e)
+        ensure
+          self.run_publish_callbacks(:after_publish_on_complete)
+        end
       end
     end
   end

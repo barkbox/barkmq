@@ -6,6 +6,7 @@ module BarkMQ
   module Config
     module Shared
       def self.included(base)
+        base.attribute :env, String, default: ENV['ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV']
         base.attribute :access_key, String, default: ENV['AWS_ACCESS_KEY_ID']
         base.attribute :secret_key, String, default: ENV['AWS_SECRET_ACCESS_KEY']
         base.attribute :region, String, default: ENV['AWS_REGION'] || 'us-east-1'

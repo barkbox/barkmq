@@ -69,26 +69,24 @@ Or install it yourself as:
 
 ### Publisher
 
-Call `acts_as_publisher` to any ActiveRecord model to enable publisher functionality. This will add the `publish_to_sns` convenience method that will serialize the ActiveRecord model and publish to the appropriate publish.
+Call `acts_as_publisher` to any ActiveRecord model to enable publisher functionality. This will add the `publish_to_sns` convenience method that will serialize the ActiveRecord model and publish to the appropriate SNS topic.
 
 ```ruby
 class User < ActiveRecord::Base
-  acts_as_publisher on: [ :create, :update ], # Optional. Default: [ :create, :update, :destroy]
-                    serializer: Api::V2::Internal::UserSerializer # Optional. Default: to_json method
+  acts_as_publisher on: [ :create, :update ],
+                    serializer: UserSerializer
 
-  after_publish :publish_registered, event: 'registered', # Optional. Default is method name stringify'ed
-                                     on: [ :create ] # Optional. Default: [ :create, :update, :destroy ]
-  after_publish :publish_registered, event: 'email_changed', # Optional. Default is method name stringify'ed
-                                     on: [ :create, :update ] # Optional. Default: [ :create, :update, :destroy ]
+  after_publish :publish_registered, event: 'shipped',
+                                     on: [ :create ],
+                                     error: publish_registered_error,
+                                     complete: Proc.new { puts "complete: " }
 
   def publish_registered
     self.publish_to_sns('registered')
   end
 
-  def publish_email_changed
-    if self.email.present? && self.previous_changes.key?(:email)
-      self.publish_to_sns('email_changed')
-    end
+  def publish_registered_error error
+    Rails.logger.error "Publish user registered failed. error=#{error.inspect}"
   end
 end
 ```

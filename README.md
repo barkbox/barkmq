@@ -1,6 +1,6 @@
 # BarkMQ
 A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
-
+[Publisher](docs/publisher.md)
 ## Installation
 
 Add this line to your application's Gemfile:

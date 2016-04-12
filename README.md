@@ -23,46 +23,39 @@ Or install it yourself as:
 Configured BarkMQ in an initializer such as `config/initializers/barkmq.rb`
 
 ```ruby
-  statsd_client = Statsd.new('localhost', 8125, tags: [ "env:#{Rails.env}" ])
-  topic_prefix = [ Rails.env, 'barkbox' ].join('-')
+topic_namespace = [ Rails.env, 'barkbox' ].join('-')
+queue_name = [ Rails.env, 'barkbox' ].join('-')
+statsd_client = Statsd.new('localhost', 8125, tags: [ "env:#{Rails.env}" ])
 
-  BarkMQ.publisher_config do |c|
-    c.access_key = 'ABCDEF' # Default: ENV['AWS_ACCESS_KEY_ID']
-    c.secret_key = '123456' # Default: ENV['AWS_SECRET_ACCESS_KEY']
-    c.region = 'us-east-1'  # Default: ENV['AWS_REGION'] or 'us-east-1'
+BarkMQ.publisher_config do |c|
+c.logger = Rails.logger
+c.topic_namespace = topic_namespace
+c.statsd = statsd_client
 
-    c.logger = Rails.logger # Default: Logger.new(STDERR)
-    c.topic_prefix = topic_prefix # Default: 'dev-unknown'
-    c.statsd = statsd_client # Default: Statsd.new
+c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'publisher',
+                                                     logger: Rails.logger,
+                                                     statsd: statsd_client
 
-    # Optional but recommended.
-    c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'publisher',
-                                                         logger: Rails.logger,
-                                                         statsd: statsd_client
+c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
+                                                    logger: Rails.logger,
+                                                    statsd: statsd_client
+end
 
-    c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
-                                                        logger: Rails.logger,
-                                                        statsd: statsd_client
-  end
+BarkMQ.subscriber_config do |c|
+c.logger = Rails.logger
+c.topic_namespace = topic_namespace
+c.statsd = statsd_client
+c.queue_name = queue_name
 
-  BarkMQ.subscriber_config do |c|
-    c.access_key = 'ABCDEF' # Default: ENV['AWS_ACCESS_KEY_ID']
-    c.secret_key = '123456' # Default: ENV['AWS_SECRET_ACCESS_KEY']
-    c.region = 'us-east-1'  # Default: ENV['AWS_REGION'] or 'us-east-1'
+c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'subscriber',
+                                                     logger: Rails.logger,
+                                                     statsd: statsd_client
 
-    c.logger = Rails.logger # Default: Logger.new(STDERR)
-    c.topic_prefix = topic_prefix # Default: 'dev-unknown'
-    c.statsd = statsd_client # Default: Statsd.new
+c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
+                                                    logger: Rails.logger,
+                                                    statsd: statsd_client
+end
 
-    # Optional but recommended.
-    c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'subscriber',
-                                                         logger: Rails.logger,
-                                                         statsd: statsd_client
-
-    c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
-                                                        logger: Rails.logger,
-                                                        statsd: statsd_client
-  end
 ```
 [Full Configuration Details](docs/config.md)
 

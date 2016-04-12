@@ -18,9 +18,7 @@ module BarkMQ
         self.subscriber_options ||= options
         BarkMQ.subscriber_config do |c|
           topics.each do |topic|
-            unless c.topic_names.include?(topic)
-              c.topic_names << topic
-            end
+            c.add_topic(topic)
             c.add_handler self, topic: topic
           end
         end

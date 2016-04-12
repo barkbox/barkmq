@@ -4,7 +4,7 @@ RSpec.describe 'BarkMQ::Publisher' do
 
   before do
     BarkMQ.publisher_config do |c|
-      c.topic_prefix = 'test-barkmq'
+      c.topic_namespace = 'test-barkmq'
     end
   end
 

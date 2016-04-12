@@ -6,7 +6,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
 
     before do
       BarkMQ.publisher_config do |c|
-        c.topic_prefix = 'test-barkmq'
+        c.topic_namespace = 'test-barkmq'
         c.topic_names = []
       end
     end
@@ -33,7 +33,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       class NewArPublisher < ActiveRecord::Base
         acts_as_publisher
 
-        after_publish :publish_tested, event: 'tested'
+        after_publish :publish_tested, topic: 'new_ar_publisher-tested'
       end
       expect(BarkMQ.pub_config.topic_names).to eq(expected_topics)
     end
@@ -49,8 +49,8 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       class NewArPublisher < ActiveRecord::Base
         acts_as_publisher
 
-        after_publish :publish_tested, event: 'tested'
-        after_publish :publish_reviewed, event: 'reviewed'
+        after_publish :publish_tested, topic: 'new_ar_publisher-tested'
+        after_publish :publish_reviewed, topic: 'new_ar_publisher-reviewed'
       end
       expect(BarkMQ.pub_config.topic_names).to eq(expected_topics)
     end

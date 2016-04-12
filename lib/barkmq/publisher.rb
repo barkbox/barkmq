@@ -21,7 +21,7 @@ module BarkMQ
 
       def topic event
         [
-          BarkMQ.pub_config.topic_prefix,
+          BarkMQ.pub_config.topic_namespace,
           self.model_name,
           event
         ].flatten.compact.join('-')

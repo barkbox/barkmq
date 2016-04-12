@@ -15,15 +15,14 @@ module BarkMQ
 
         options[:on] ||= [ :create, :update, :destroy ]
         options[:on] = Array(options[:on])
-        event_lookup = {
-          create: 'created',
-          update: 'updated',
-          destroy: 'destroyed'
-        }
+        options[:create_topic] ||= [ self.model_name.param_key, 'created' ].join('-')
+        options[:update_topic] ||= [ self.model_name.param_key, 'updated' ].join('-')
+        options[:destroy_topic] ||= [ self.model_name.param_key, 'destroyed' ].join('-')
 
         options[:on].each do |action|
           BarkMQ.publisher_config do |c|
-            c.add_topic(self.model_name.param_key, event_lookup[action])
+            topic = options["#{action}_topic".to_sym]
+            c.add_topic(topic)
           end
           after_commit "after_#{action}_publish".to_sym, on: action.to_sym
         end
@@ -33,10 +32,10 @@ module BarkMQ
       def add_publish_callback method, options={}
         options[:on] ||= [ :create, :update, :destroy ]
         options[:on] = Array(options[:on])
-        options[:event] ||= method.to_s
+        options[:topic] # add validator
 
         BarkMQ.publisher_config do |c|
-          c.add_topic(self.model_name.param_key, options[:event])
+          c.add_topic(options[:topic])
         end
 
         options[:on].each do |action|

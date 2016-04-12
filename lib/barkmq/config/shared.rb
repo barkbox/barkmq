@@ -11,16 +11,16 @@ module BarkMQ
         base.attribute :secret_key, String, default: ENV['AWS_SECRET_ACCESS_KEY']
         base.attribute :region, String, default: ENV['AWS_REGION'] || 'us-east-1'
         base.attribute :logger, Logger, default: Logger.new(STDERR)
-        base.attribute :topic_prefix, String, default: 'dev-unknown'
+        base.attribute :topic_namespace, String, default: nil
         base.attribute :topic_names, Array, default: []
         base.attribute :statsd, Statsd, default: Statsd.new
         base.attribute :error_handler
       end
 
-      def add_topic(model, event)
-        topic_name = [topic_prefix, model, event].flatten.compact.join('-')
-        unless topic_names.include?(topic_name)
-          topic_names << topic_name
+      def add_topic(topic)
+        full_topic = [topic_namespace, topic].flatten.compact.join('-')
+        unless topic_names.include?(full_topic)
+          topic_names << full_topic
         end
       end
     end

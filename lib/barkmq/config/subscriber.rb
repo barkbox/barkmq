@@ -11,12 +11,8 @@ module BarkMQ
       attribute :queue_name, String
       attribute :dead_letter_queue_name, String
 
-      def queue_name
-        super || "#{topic_prefix}"
-      end
-
       def dead_letter_queue_name
-        super || "#{topic_prefix}-failures"
+        super || "#{queue_name}-failures"
       end
 
       def middleware
@@ -35,7 +31,7 @@ module BarkMQ
       end
 
       def add_handler handler_class, options={}
-        topic_name = options[:topic].to_s
+        topic_name = [ self.topic_namespace, options[:topic].to_s ].compact.join('-')
         handlers[topic_name] = handler_class
       end
     end

@@ -14,8 +14,8 @@ describe BarkMQ, type: :model do
 
     it 'accepts a block' do
       expect {
-        subject.send(method) { |c| c.topic_prefix = 'foo' }
-      }.to change { subject.send(method).topic_prefix }.to('foo')
+        subject.send(method) { |c| c.topic_namespace = 'foo' }
+      }.to change { subject.send(method).topic_namespace }.to('foo')
     end
   end
 
@@ -38,6 +38,9 @@ describe BarkMQ, type: :model do
 
   describe '.subscribe!' do
     before do
+      BarkMQ.subscriber_config do |c|
+        c.topic_namespace = 'barkmq-test'
+      end
       BarkMQ.sub_config.topic_names = []
       BarkMQ.sub_config.clear_handlers
     end
@@ -49,7 +52,7 @@ describe BarkMQ, type: :model do
     end
 
     it 'handles message with handler' do
-      $topics = 'test_topic_single_string'
+      $topics = 'topic_single_string'
 
       class NewSubscriberWorker
         include BarkMQ::Subscriber
@@ -61,8 +64,8 @@ describe BarkMQ, type: :model do
       end
 
       expect(NewSubscriberWorker).to receive(:new).and_return(NewSubscriberWorker.new)
-      expect_any_instance_of(NewSubscriberWorker).to receive(:perform).with('test_topic_single_string', 'message')
-      BarkMQ.handle_message('test_topic_single_string', 'message')
+      expect_any_instance_of(NewSubscriberWorker).to receive(:perform).with('barkmq-test-topic_single_string', 'message')
+      BarkMQ.handle_message('barkmq-test-topic_single_string', 'message')
     end
 
     it 'raises error on message without handler' do
@@ -78,7 +81,7 @@ describe BarkMQ, type: :model do
         barkmq_subscriber_options topics: $topics
       end
 
-      expect{ BarkMQ.handle_message('test_topic_single_string', 'message') }.to raise_error(BarkMQ::SubscriberNotImplemented)
+      expect{ BarkMQ.handle_message('barkmq-test-test_topic_single_string', 'message') }.to raise_error(BarkMQ::SubscriberNotImplemented)
     end
   end
 

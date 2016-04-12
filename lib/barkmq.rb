@@ -33,6 +33,7 @@ module BarkMQ
         c.lock_strategy = Circuitry::Locks::Redis.new(client: Redis.new)
         c.async_strategy = :thread
         c.on_async_exit = proc do
+          Circuitry.flush
           if defined?(ActiveRecord::Base)
             ActiveRecord::Base.connection.close
           end
@@ -60,6 +61,9 @@ module BarkMQ
         c.logger = @_pub_config.logger
 
         c.async_strategy = :thread
+        c.on_async_exit = proc do
+          Circuitry.flush
+        end
         c.topic_names = @_pub_config.topic_names
         c.error_handler = @_pub_config.error_handler
 

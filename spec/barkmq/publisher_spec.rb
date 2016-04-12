@@ -31,14 +31,15 @@ RSpec.describe 'BarkMQ::Publisher' do
         include BarkMQ::Publisher
       end
       @publisher = NewPublisher.new
-      expect(@publisher.topic('created')).to eq('test-barkmq-created')
+      expect(@publisher.full_topic('created')).to eq('test-barkmq-created')
     end
 
     it 'ActiveRecord with no options' do
       class NewArPublisher < ActiveRecord::Base
       end
       @publisher = NewArPublisher.new
-      expect(@publisher.topic('created')).to eq('test-barkmq-new_ar_publisher-created')
+      expect(@publisher.publish_topics[:create]).to eq('new_ar_publisher-created')
+      expect(@publisher.full_topic(@publisher.publish_topics[:create])).to eq('test-barkmq-new_ar_publisher-created')
     end
   end
 

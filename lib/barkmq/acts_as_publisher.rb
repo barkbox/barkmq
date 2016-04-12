@@ -10,18 +10,25 @@ module BarkMQ
         send :include, InstanceMethods
 
         class_attribute :publish_callbacks
+        class_attribute :publish_topics
 
         self.publish_callbacks = {}
+        self.publish_topics = {}
 
         options[:on] ||= [ :create, :update, :destroy ]
         options[:on] = Array(options[:on])
+
         options[:create_topic] ||= [ self.model_name.param_key, 'created' ].join('-')
         options[:update_topic] ||= [ self.model_name.param_key, 'updated' ].join('-')
         options[:destroy_topic] ||= [ self.model_name.param_key, 'destroyed' ].join('-')
 
+        self.publish_topics[:create] ||= options[:create_topic]
+        self.publish_topics[:update] ||= options[:update_topic]
+        self.publish_topics[:destroy] ||= options[:destroy_topic]
+
         options[:on].each do |action|
           BarkMQ.publisher_config do |c|
-            topic = options["#{action}_topic".to_sym]
+            topic = self.publish_topics[action.to_sym]
             c.add_topic(topic)
           end
           after_commit "after_#{action}_publish".to_sym, on: action.to_sym
@@ -70,7 +77,8 @@ module BarkMQ
 
       def after_create_publish
         begin
-          self.publish_to_sns('created')
+          topic = self.publish_topics[:create]
+          self.publish_to_sns(topic)
           self.run_publish_callbacks(:after_publish_on_create)
         rescue => e
           self.run_publish_callbacks(:after_publish_on_error, e)
@@ -81,7 +89,8 @@ module BarkMQ
 
       def after_update_publish
         begin
-          self.publish_to_sns('updated')
+          topic = self.publish_topics[:update]
+          self.publish_to_sns(topic)
           self.run_publish_callbacks(:after_publish_on_update)
         rescue => e
           self.run_publish_callbacks(:after_publish_on_error, e)
@@ -92,7 +101,8 @@ module BarkMQ
 
       def after_destroy_publish
         begin
-          self.publish_to_sns('destroyed')
+          topic = self.publish_topics[:destroy]
+          self.publish_to_sns(topic)
           self.run_publish_callbacks(:after_publish_on_destroy)
         rescue => e
           self.run_publish_callbacks(:after_publish_on_error, e)

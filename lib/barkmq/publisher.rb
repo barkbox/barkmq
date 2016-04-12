@@ -19,11 +19,10 @@ module BarkMQ
         end
       end
 
-      def topic event
+      def full_topic topic
         [
           BarkMQ.pub_config.topic_namespace,
-          self.model_name,
-          event
+          topic
         ].flatten.compact.join('-')
       end
 
@@ -35,10 +34,10 @@ module BarkMQ
         end
       end
 
-      def publish_to_sns event='created', options={}
-        topic_name = topic(event)
+      def publish_to_sns topic, options={}
+        topic_name = full_topic(topic)
         obj = serialized_object(options)
-        BarkMQ.publish(topic_name, obj, async: true, timeout: 20)
+        BarkMQ.publish(topic_name, obj, async: true, timeout: 30)
       rescue Aws::SNS::Errors::NotFound => e
         BarkMQ.pub_config.logger.error "SNS topic not found topic_name=#{topic_name.inspect}"
         BarkMQ.pub_config.statsd.event("SNS topic not found.",

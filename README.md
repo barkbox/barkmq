@@ -28,32 +28,32 @@ queue_name = [ Rails.env, 'barkbox' ].join('-')
 statsd_client = Statsd.new('localhost', 8125, tags: [ "env:#{Rails.env}" ])
 
 BarkMQ.publisher_config do |c|
-c.logger = Rails.logger
-c.topic_namespace = topic_namespace
-c.statsd = statsd_client
+  c.logger = Rails.logger
+  c.topic_namespace = topic_namespace
+  c.statsd = statsd_client
 
-c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'publisher',
-                                                     logger: Rails.logger,
-                                                     statsd: statsd_client
+  c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'publisher',
+                                                       logger: Rails.logger,
+                                                       statsd: statsd_client
 
-c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
-                                                    logger: Rails.logger,
-                                                    statsd: statsd_client
+  c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
+                                                      logger: Rails.logger,
+                                                      statsd: statsd_client
 end
 
 BarkMQ.subscriber_config do |c|
-c.logger = Rails.logger
-c.topic_namespace = topic_namespace
-c.statsd = statsd_client
-c.queue_name = queue_name
+  c.logger = Rails.logger
+  c.topic_namespace = topic_namespace
+  c.statsd = statsd_client
+  c.queue_name = queue_name
 
-c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'subscriber',
-                                                     logger: Rails.logger,
-                                                     statsd: statsd_client
+  c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'subscriber',
+                                                       logger: Rails.logger,
+                                                       statsd: statsd_client
 
-c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
-                                                    logger: Rails.logger,
-                                                    statsd: statsd_client
+  c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
+                                                      logger: Rails.logger,
+                                                      statsd: statsd_client
 end
 
 ```

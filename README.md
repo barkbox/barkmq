@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ## Configuration
 
-`config/initializers/barkmq.rb`
+Configured BarkMQ in an initializer such as `config/initializers/barkmq.rb`
 
 ```ruby
   statsd_client = Statsd.new('localhost', 8125, tags: [ "env:#{Rails.env}" ])
@@ -64,6 +64,7 @@ Or install it yourself as:
                                                         statsd: statsd_client
   end
 ```
+[Full Configuration Details](docs/config.md)
 
 ## Usage
 
@@ -90,7 +91,7 @@ class User < ActiveRecord::Base
   end
 end
 ```
-[More Publisher Details](docs/publisher.md)
+[Full Publisher Details](docs/publisher.md)
 
 ### Subscriber
 
@@ -112,7 +113,7 @@ class UserRegisteredWorker
   end
 end
 ```
-[More Subscriber Details](docs/subscriber.md)
+[Full Subscriber Details](docs/subscriber.md)
 
 ### Setup
 To create the AWS SNS topics, SQS queues, and the appropriate subscription relationships:

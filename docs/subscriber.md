@@ -1,5 +1,9 @@
 # Subscriber
 
-## Syntax
+## barkmq_subscriber_options
 
-## Options
+### topics
+
+## add_handler
+
+## clear_handlers

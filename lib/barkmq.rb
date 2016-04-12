@@ -18,8 +18,6 @@ module BarkMQ
     def subscriber_config(&block)
       @_sub_config ||= Config::Subscriber.new
       yield @_sub_config if block_given?
-      logger = @_sub_config.logger
-      statsd = @_sub_config.statsd
       Circuitry.subscriber_config do |c|
         c.queue_name = @_sub_config.queue_name
         c.dead_letter_queue_name = @_sub_config.dead_letter_queue_name
@@ -55,8 +53,6 @@ module BarkMQ
     def publisher_config(&block)
       @_pub_config ||= Config::Publisher.new
       yield @_pub_config if block_given?
-      logger = @_pub_config.logger
-      statsd = @_pub_config.statsd
       Circuitry.publisher_config do |c|
         c.access_key = @_pub_config.access_key
         c.secret_key = @_pub_config.secret_key

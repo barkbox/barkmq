@@ -26,13 +26,13 @@ An ActiveSerializer that serializes the ActiveRecord model before publishing to 
 You can specify custom behavior upon the successful publishing of `create, :update, and :destroy` publish events using the `after_publish` method.
 
 ```ruby
-after_publish :publish_registered, event: 'registered',
+after_publish :publish_registered, topic: 'user_registered',
                                    on: [ :create ],
                                    error: publish_registered_error,
                                    complete: Proc.new { puts "complete: " }
 
 def publish_registered
-  self.publish_to_sns('registered')
+  self.publish_to_sns('user_registered')
 end
 
 def publish_registered_error error

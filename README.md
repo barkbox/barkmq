@@ -70,13 +70,13 @@ class User < ActiveRecord::Base
   acts_as_publisher on: [ :create, :update ],
                     serializer: UserSerializer
 
-  after_publish :publish_registered, event: 'shipped',
+  after_publish :publish_registered, topic: 'user-registered',
                                      on: [ :create ],
                                      error: publish_registered_error,
                                      complete: Proc.new { puts "complete: " }
 
   def publish_registered
-    self.publish_to_sns('registered')
+    self.publish_to_sns('user-registered')
   end
 
   def publish_registered_error error
@@ -98,7 +98,7 @@ The execution is synchronous so if it's time intensive pass it off to a delayed 
 class UserRegisteredWorker
   include BarkMQ::Subscriber
 
-  barkmq_subscriber_options topics: [ "#{Rails.env}-barkbox-user-registered" ]
+  barkmq_subscriber_options topics: [ "user-registered" ]
 
   def perform topic, message
     user_id = message['user']['id']

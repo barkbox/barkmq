@@ -14,7 +14,7 @@ namespace :barkmq do
   desc 'BarkMQ subscriber queue worker'
   task :work => [:environment] do |t, args|
     concurrency = ENV['BARKMQ_CONCURRENCY'] || 10
-    queues =  ENV['BARKMQ_QUEUES'] || BarkMQ.sub_config.queue_name
-    system("bundle exec shoryuken -R -v -c #{concurrency} -q #{queues}")
+    queue = ENV['BARKMQ_QUEUE'] || BarkMQ.sub_config.queue_name
+    system("bundle exec shoryuken -v -R -r barkmq/message_worker.rb -c #{concurrency} -q #{queue}")
   end
 end

@@ -8,6 +8,10 @@ module BarkMQ
 
     attr_accessor :topic, :message
 
+    server_middleware do |c|
+      c.add BarkMQ::Middleware::DatadogSubscriberLogger
+    end
+
     def perform sqs_msg, body
       BarkMQ.handle_message(topic, message)
     end

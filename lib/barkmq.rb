@@ -26,14 +26,6 @@ module BarkMQ
         c.visibility_timeout = 30
       end
       require 'barkmq/message_worker'
-      BarkMQ::MessageWorker.server_middleware do |c|
-        # BarkMQ.sub_config.middleware.entries.each do
-          c.add BarkMQ::Middleware::DatadogSubscriberLogger
-        # end
-        # @_sub_config.middleware.entries.each do |entry|
-        #   c.middleware.add(entry.klass, *entry.args)
-        # end
-      end
       @_sub_config
     end
 

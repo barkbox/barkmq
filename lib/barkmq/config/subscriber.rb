@@ -15,12 +15,6 @@ module BarkMQ
         super || "#{queue_name}-failures"
       end
 
-      def middleware
-        @middleware ||= Circuitry::Middleware::Chain.new
-        yield @middleware if block_given?
-        @middleware
-      end
-
       def handlers
         @handlers ||= {}
         @handlers

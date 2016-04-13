@@ -20,6 +20,11 @@ module BarkMQ
     def subscriber_config(&block)
       @_sub_config ||= Config::Subscriber.new
       yield @_sub_config if block_given?
+      Circuitry.subscriber_config do |c|
+        c.queue_name = @_sub_config.queue_name
+        c.topic_names = @_sub_config.topic_names
+        c.visibility_timeout = 30
+      end
       require 'barkmq/message_worker'
       BarkMQ::MessageWorker.server_middleware do |c|
         # BarkMQ.sub_config.middleware.entries.each do

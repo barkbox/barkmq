@@ -4,7 +4,6 @@ module BarkMQ
   module Subscriber
     def self.included(base)
       base.send :extend, ClassMethods
-      base.send :include, Shoryuken::Worker
     end
 
     module ClassMethods

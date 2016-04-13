@@ -15,8 +15,8 @@ namespace :barkmq do
   task :work => [:environment] do |t, args|
     options = {
       lock: true,
-      async: true,
-      timeout: 20,
+      async: false,
+      timeout: 30,
       wait_time: 1,
       batch_size: 10
     }

@@ -5,6 +5,7 @@ require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'
 require 'barkmq/handlers/default_error'
 require 'barkmq/middleware/datadog_logger'
+require 'barkmq/middleware/datadog_subscriber_logger'
 require 'barkmq/subscriber'
 require 'barkmq/publisher'
 require 'barkmq/acts_as_publisher'
@@ -19,29 +20,14 @@ module BarkMQ
     def subscriber_config(&block)
       @_sub_config ||= Config::Subscriber.new
       yield @_sub_config if block_given?
-      Circuitry.subscriber_config do |c|
-        c.queue_name = @_sub_config.queue_name
-        c.dead_letter_queue_name = @_sub_config.dead_letter_queue_name
-        c.topic_names = @_sub_config.topic_names
-        c.max_receive_count = 8
-        c.visibility_timeout = 30
-        c.access_key = @_sub_config.access_key
-        c.secret_key = @_sub_config.secret_key
-        c.region = @_sub_config.region
-        c.logger = @_sub_config.logger
-        c.error_handler = @_sub_config.error_handler
-
-        c.lock_strategy = Circuitry::Locks::Redis.new(client: Redis.new)
-        c.async_strategy = :thread
-        c.on_async_exit = proc do
-          if defined?(ActiveRecord)
-            ActiveRecord::Base.connection.close
-          end
-        end
-        c.middleware.clear
-        @_sub_config.middleware.entries.each do |entry|
-          c.middleware.add(entry.klass, *entry.args)
-        end
+      require 'barkmq/message_worker'
+      BarkMQ::MessageWorker.server_middleware do |c|
+        # BarkMQ.sub_config.middleware.entries.each do
+          c.add BarkMQ::Middleware::DatadogSubscriberLogger
+        # end
+        # @_sub_config.middleware.entries.each do |entry|
+        #   c.middleware.add(entry.klass, *entry.args)
+        # end
       end
       @_sub_config
     end

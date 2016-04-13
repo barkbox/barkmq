@@ -1,5 +1,3 @@
-require 'barkmq/config/subscriber'
-
 module BarkMQ
 
   class MessageWorker

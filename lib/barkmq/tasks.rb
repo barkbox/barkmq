@@ -11,22 +11,10 @@ namespace :barkmq do
     Circuitry::Provisioning.provision(logger: logger)
   end
 
-  desc "Work circuitry queue"
+  desc 'BarkMQ subscriber queue worker'
   task :work => [:environment] do |t, args|
-    options = {
-      lock: true,
-      async: false,
-      timeout: 30,
-      wait_time: 1,
-      batch_size: 10
-    }
-    database_url = ENV['DATABASE_URL']
-    pool_size = ENV['BARKMQ_POOL_SIZE'] || options[:batch_size] || 10
-    if database_url
-      ENV['DATABASE_URL'] = "#{database_url}?pool=#{pool_size}"
-      ActiveRecord::Base.establish_connection if defined?(Rails)
-    end
-    Rails.application.eager_load! if defined?(Rails)
-    BarkMQ.subscribe!(options)
+    concurrency = ENV['BARKMQ_CONCURRENCY'] || 10
+    queues =  ENV['BARKMQ_QUEUES'] || BarkMQ.sub_config.queue_name
+    system("bundle exec shoryuken -R -v -c #{concurrency} -q #{queues}")
   end
 end

@@ -1,4 +1,5 @@
 require 'circuitry'
+require 'shoryuken'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'

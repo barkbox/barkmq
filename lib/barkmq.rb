@@ -60,12 +60,6 @@ module BarkMQ
       @_pub_config
     end
 
-    def subscribe!(options={})
-      Circuitry.subscribe(options) do |message, topic_name|
-        BarkMQ.handle_message(topic_name, message)
-      end
-    end
-
     def handle_message topic_name, message
       if @_sub_config.handlers[topic_name.to_s]
         @_sub_config.handlers[topic_name.to_s].new.perform(topic_name, message)

@@ -45,12 +45,6 @@ describe BarkMQ, type: :model do
       BarkMQ.sub_config.clear_handlers
     end
 
-    it 'to subscribes through circuitry' do
-      options = { }
-      expect(Circuitry).to receive(:subscribe).with(options)
-      BarkMQ.subscribe!(options)
-    end
-
     it 'handles message with handler' do
       $topics = 'topic_single_string'
 

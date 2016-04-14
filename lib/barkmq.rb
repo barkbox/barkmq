@@ -1,5 +1,7 @@
 require 'circuitry'
 require 'shoryuken'
+require 'celluloid'
+require 'celluloid/current'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'
@@ -9,6 +11,7 @@ require 'barkmq/middleware/datadog_subscriber_logger'
 require 'barkmq/subscriber'
 require 'barkmq/publisher'
 require 'barkmq/acts_as_publisher'
+require 'barkmq/async_publisher'
 require 'barkmq/frameworks/active_record' if defined?(ActiveRecord)
 require 'barkmq/version'
 
@@ -43,7 +46,7 @@ module BarkMQ
         c.region = @_pub_config.region
         c.logger = @_pub_config.logger
 
-        c.async_strategy = :thread
+        c.async_strategy = :batch
         c.on_async_exit = proc do
           # Circuitry.flush
         end
@@ -52,6 +55,8 @@ module BarkMQ
         c.middleware.add BarkMQ::Middleware::DatadogPublisherLogger, logger: @_pub_config.logger,
                                                                      statsd: @_pub_config.statsd
       end
+      concurrency = ENV['BARKMQ_PUBLISHER_CONCURRENCY'] || Celluloid.cores
+      Celluloid::Actor[:publisher] = AsyncPublisher.pool(size: concurrency)
       @_pub_config
     end
 
@@ -69,7 +74,8 @@ module BarkMQ
     end
 
     def publish(topic_name, object, options={})
-      Circuitry::Publisher.new(options).publish(topic_name, object)
+      # Circuitry::Publisher.new(options).publish(topic_name, object)
+      Celluloid::Actor[:publisher].async.publish(topic_name, object, options={})
     end
 
   end

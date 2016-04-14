@@ -49,10 +49,9 @@ module BarkMQ
         end
         c.topic_names = @_pub_config.topic_names
         c.error_handler = @_pub_config.error_handler
-
-        @_pub_config.middleware.entries.each do |entry|
-          c.middleware.add(entry.klass, *entry.args)
-        end
+        c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
+                                                            logger: @_pub_config.logger,
+                                                            statsd: @_pub_config.statsd
       end
       @_pub_config
     end

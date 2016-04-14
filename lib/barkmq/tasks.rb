@@ -15,6 +15,6 @@ namespace :barkmq do
   task :work => [:environment] do |t, args|
     concurrency = ENV['BARKMQ_CONCURRENCY'] || 10
     queue = ENV['BARKMQ_QUEUE'] || BarkMQ.sub_config.queue_name
-    system("bundle exec shoryuken -v -R -c #{concurrency} -q #{queue}")
+    system("bundle exec shoryuken -R -c #{concurrency} -q #{queue}")
   end
 end

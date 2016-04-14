@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe 'BarkMQ::Publisher' do
+RSpec.describe BarkMQ::Publisher do
 
   before do
     BarkMQ.publisher_config do |c|

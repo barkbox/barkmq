@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe 'BarkMQ::Subscriber' do
+RSpec.describe BarkMQ::Subscriber do
 
   describe '.barkmq_subscriber_options' do
 

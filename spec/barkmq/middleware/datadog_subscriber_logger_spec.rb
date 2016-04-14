@@ -30,6 +30,10 @@ RSpec.describe BarkMQ::Middleware::DatadogSubscriberLogger do
         expect(subject.statsd).to receive(:gauge).with('barkmq.message.process.time', anything, {:tags=>["topic:test_topic"]})
         call
       end
+
+      it 'set topic and message' do
+        
+      end
     end
 
     describe 'when call fails' do

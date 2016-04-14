@@ -28,10 +28,10 @@ describe BarkMQ, type: :model do
   end
 
   describe '.publish' do
-    it 'to publish through circuitry' do
+    it 'to publish through async publisher' do
+      BarkMQ.publisher_config
       options = {}
-      expect(Circuitry::Publisher).to receive(:new).with(options).and_return(Circuitry::Publisher.new(options))
-      expect_any_instance_of(Circuitry::Publisher).to receive(:publish).with('test_topic', 'message')
+      expect(Celluloid::Actor[:publisher]).to receive_message_chain(:async, :publish).with('test_topic', 'message', options)
       BarkMQ.publish('test_topic', 'message', options)
     end
   end

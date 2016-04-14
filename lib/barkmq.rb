@@ -54,7 +54,7 @@ module BarkMQ
                                                                      statsd: @_pub_config.statsd
       end
       concurrency = ENV['BARKMQ_PUBLISHER_CONCURRENCY'] || Celluloid.cores
-      Celluloid::Actor[:publisher] = AsyncPublisher.pool(size: concurrency)
+      Celluloid::Actor[:publisher] = BarkMQ::AsyncPublisher.pool(size: concurrency)
       @_pub_config
     end
 

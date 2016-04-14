@@ -47,11 +47,9 @@ module BarkMQ
         c.logger = @_pub_config.logger
 
         c.async_strategy = :batch
-        c.on_async_exit = proc do
-          # Circuitry.flush
-        end
         c.topic_names = @_pub_config.topic_names
         c.error_handler = @_pub_config.error_handler
+
         c.middleware.add BarkMQ::Middleware::DatadogPublisherLogger, logger: @_pub_config.logger,
                                                                      statsd: @_pub_config.statsd
       end

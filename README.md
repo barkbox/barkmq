@@ -42,10 +42,6 @@ BarkMQ.subscriber_config do |c|
   c.topic_namespace = topic_namespace
   c.statsd = statsd_client
   c.queue_name = queue_name
-
-  c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'subscriber',
-                                                       logger: Rails.logger,
-                                                       statsd: statsd_client
 end
 
 ```

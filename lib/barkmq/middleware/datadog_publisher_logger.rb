@@ -1,10 +1,9 @@
 module BarkMQ
   module Middleware
-    class DatadogLogger
-      attr_reader :namespace, :logger, :statsd
+    class DatadogPublisherLogger
+      attr_reader :logger, :statsd
 
-      def initialize(namespace: '', logger: Logger.new(STDOUT), statsd: Statsd.new)
-        self.namespace = namespace
+      def initialize(logger: Logger.new(STDOUT), statsd: Statsd.new)
         self.logger = logger
         self.statsd = statsd
       end
@@ -27,41 +26,20 @@ module BarkMQ
       end
 
       def start_metric
-        case namespace
-        when 'publisher'
-          'barkmq.message.publish'
-        when 'subscriber'
-          'barkmq.message.received'
-        else
-          nil
-        end
+        'barkmq.message.publish'
       end
 
       def end_metric
-        case namespace
-        when 'publisher'
-          'barkmq.message.published'
-        when 'subscriber'
-          'barkmq.message.processed'
-        else
-          nil
-        end
+        'barkmq.message.published'
       end
 
       def time_metric
-        case namespace
-        when 'publisher'
-          'barkmq.message.publish.time'
-        when 'subscriber'
-          'barkmq.message.process.time'
-        else
-          nil
-        end
+        'barkmq.message.publish.time'
       end
 
       private
 
-      attr_writer :namespace, :logger, :statsd
+      attr_writer :logger, :statsd
     end
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe BarkMQ::Middleware::DatadogLogger do
+RSpec.describe BarkMQ::Middleware::DatadogPublisherLogger do
   subject { described_class.new(options) }
 
   let(:statsd) { Statsd.new }
@@ -11,7 +11,7 @@ RSpec.describe BarkMQ::Middleware::DatadogLogger do
     end
 
     describe 'when publisher succeeds' do
-      let(:options) { { namespace: 'publisher', logger: Logger.new('/tmp/blank.log'), statsd: statsd } }
+      let(:options) { {  logger: Logger.new('/tmp/blank.log'), statsd: statsd } }
       let(:block) { -> {} }
 
       it 'instrument to statsd' do
@@ -22,20 +22,8 @@ RSpec.describe BarkMQ::Middleware::DatadogLogger do
       end
     end
 
-    describe 'when subscriber succeeds' do
-      let(:options) { { namespace: 'subscriber', logger: Logger.new('/tmp/blank.log'), statsd: statsd } }
-      let(:block) { -> {} }
-
-      it 'instrument to statsd' do
-        expect(statsd).to receive(:increment).with('barkmq.message.received', {:tags=>["topic:test_topic"]})
-        expect(statsd).to receive(:increment).with('barkmq.message.processed', {:tags=>["topic:test_topic"]})
-        expect(statsd).to receive(:gauge).with('barkmq.message.process.time', anything, {:tags=>["topic:test_topic"]})
-        call
-      end
-    end
-
     describe 'when call fails' do
-      let(:options) { { namespace: 'subscriber', logger: Logger.new('/tmp/blank.log'), statsd: statsd } }
+      let(:options) { { logger: Logger.new('/tmp/blank.log'), statsd: statsd } }
       let(:block) { ->{ raise StandardError, 'test failure' } }
 
       it 'raises the error' do

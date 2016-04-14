@@ -35,10 +35,6 @@ BarkMQ.publisher_config do |c|
   c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'publisher',
                                                        logger: Rails.logger,
                                                        statsd: statsd_client
-
-  c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
-                                                      logger: Rails.logger,
-                                                      statsd: statsd_client
 end
 
 BarkMQ.subscriber_config do |c|
@@ -50,10 +46,6 @@ BarkMQ.subscriber_config do |c|
   c.error_handler = BarkMQ::Handlers::DefaultError.new namespace: 'subscriber',
                                                        logger: Rails.logger,
                                                        statsd: statsd_client
-
-  c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'subscriber',
-                                                      logger: Rails.logger,
-                                                      statsd: statsd_client
 end
 
 ```

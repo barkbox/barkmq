@@ -4,7 +4,7 @@ require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'
 require 'barkmq/handlers/default_error'
-require 'barkmq/middleware/datadog_logger'
+require 'barkmq/middleware/datadog_publisher_logger'
 require 'barkmq/middleware/datadog_subscriber_logger'
 require 'barkmq/subscriber'
 require 'barkmq/publisher'
@@ -49,9 +49,8 @@ module BarkMQ
         end
         c.topic_names = @_pub_config.topic_names
         c.error_handler = @_pub_config.error_handler
-        c.middleware.add BarkMQ::Middleware::DatadogLogger, namespace: 'publisher',
-                                                            logger: @_pub_config.logger,
-                                                            statsd: @_pub_config.statsd
+        c.middleware.add BarkMQ::Middleware::DatadogPublisherLogger, logger: @_pub_config.logger,
+                                                                     statsd: @_pub_config.statsd
       end
       @_pub_config
     end

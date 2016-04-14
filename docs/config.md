@@ -49,10 +49,6 @@ Object that responds to call. Optional. Default: `nil`
 
 Called if internals of a subscriber or publisher throws an exception.
 
-## Publisher
-
-### middleware
-
 ## Subscriber
 
 ### queue_name

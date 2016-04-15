@@ -9,14 +9,15 @@ module BarkMQ
         self.statsd = statsd
       end
 
-      def call error
-        logger.error "BarkMQ #{namespace} error=#{error.inspect}"
-        statsd.increment("barkmq.message.#{namespace}.error", tags: [ "category:#{namespace}" ])
+      def call topic_name, error
+        logger.error "BarkMQ #{namespace.inspect} error. " +
+                     "topic_name=#{topic_name.inspect} " +
+                     "error=#{error.inspect}"
+        statsd.increment("barkmq.message.#{namespace}.error", tags: [ "topic_name:#{topic_name}" ])
         statsd.event("BarkMQ #{namespace} error.",
                      "error=#{error.inspect}\n",
                      alert_type: 'error',
-                     tags: [ "category:#{namespace}" ])
-        Circuitry.flush if namespace == 'publisher'
+                     tags: [ "topic_name:#{topic_name}" ])
       end
 
       private

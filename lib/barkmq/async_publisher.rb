@@ -14,7 +14,6 @@ module BarkMQ
     end
 
     def publish(topic_name, object, options={})
-      middleware = BarkMQ::Middleware::DatadogPublisherLogger.new(logger: logger, statsd: statsd)
       middleware.call(topic_name, object) do
         begin
           message = object.to_json
@@ -52,6 +51,10 @@ module BarkMQ
 
     def error_handler
       BarkMQ.publisher_config.error_handler
+    end
+
+    def middleware
+      BarkMQ::Middleware::DatadogPublisherLogger.new(logger: logger, statsd: statsd)
     end
   end
 end

@@ -48,9 +48,6 @@ module BarkMQ
 
         c.async_strategy = :batch
         c.topic_names = @_pub_config.topic_names
-
-        c.middleware.add BarkMQ::Middleware::DatadogPublisherLogger, logger: @_pub_config.logger,
-                                                                     statsd: @_pub_config.statsd
       end
 
       concurrency = ENV['BARKMQ_PUBLISHER_CONCURRENCY'] || Celluloid.cores

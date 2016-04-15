@@ -15,7 +15,7 @@ RSpec.describe BarkMQ::Handlers::DefaultError do
 
       it 'instrument to statsd' do
         expect(statsd).to receive(:increment).with('barkmq.message.publisher.error', {:tags=>["topic_name:test_topic"]})
-        expect(statsd).to receive(:event).with("BarkMQ publisher error.", anything, anything)
+        expect(statsd).to receive(:event).with("BarkMQ error. namespace=\"publisher\"", anything, anything)
         call
       end
     end
@@ -25,7 +25,7 @@ RSpec.describe BarkMQ::Handlers::DefaultError do
 
       it 'instrument to statsd' do
         expect(statsd).to receive(:increment).with('barkmq.message.subscriber.error', {:tags=>["topic_name:test_topic"]})
-        expect(statsd).to receive(:event).with("BarkMQ subscriber error.", anything, anything)
+        expect(statsd).to receive(:event).with("BarkMQ error. namespace=\"subscriber\"", anything, anything)
         call
       end
     end

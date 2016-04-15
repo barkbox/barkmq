@@ -2,6 +2,12 @@ require 'spec_helper'
 
 RSpec.describe BarkMQ::ActsAsPublisher do
 
+  before do
+    BarkMQ.publisher_config do |c|
+      c.logger = Logger.new('/tmp/blank.log')
+    end
+  end
+
   describe '.acts_as_publisher' do
 
     before do

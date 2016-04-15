@@ -35,6 +35,8 @@ module BarkMQ
                          "error_message=#{e.message.inspect}"
             raise e
           end
+        ensure
+          ActiveRecord::Base.connection.close
         end
       end
     end

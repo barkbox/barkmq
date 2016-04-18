@@ -7,7 +7,8 @@ module BarkMQ
     class Publisher
       include Virtus::Model
       include Shared
-    end
 
+      attribute :middleware
+    end
   end
 end

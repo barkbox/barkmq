@@ -57,6 +57,16 @@ RSpec.describe BarkMQ::AsyncPublisher do
       expect(subject.wrapped_object).to receive_message_chain(:error_handler, :call).with(topic_name, BarkMQ::PublishTimeout)
       publish({ timeout: 1 })
     end
+
+    it 'retries connection error' do
+      subject.wrapped_object.instance_eval do
+        def _publish topic_arn, message
+          raise ::Aws::SNS::Errors::InternalFailure.new('test', 'error')
+        end
+      end
+      expect(subject.wrapped_object).to receive(:_publish).and_call_original.exactly(3).times
+      publish
+    end
   end
 
 end

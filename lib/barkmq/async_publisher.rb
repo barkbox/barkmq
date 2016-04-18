@@ -48,11 +48,6 @@ module BarkMQ
       end
     end
 
-    def timeout topic_name
-      @timer.cancel if @timer
-      error_handler.call(topic_name, PublishTimeout)
-    end
-
     private
 
     def logger
@@ -69,6 +64,11 @@ module BarkMQ
 
     def middleware
       BarkMQ.publisher_config.middleware
+    end
+
+    def timeout topic_name
+      @timer.cancel if @timer
+      error_handler.call(topic_name, PublishTimeout)
     end
   end
 end

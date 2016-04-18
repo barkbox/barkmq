@@ -22,8 +22,8 @@ module BarkMQ
         @timer = after(options[:timeout] || PUBLISH_TIMEOUT) { timeout(topic_name) }
         message = message.to_json
         handler = -> (e, attempt_number, _total_delay) do
-          logger.error "SNS pub error."
-          logger.error "SNS publish error. attempt_number=#{attempt_number} " +
+          logger.error "SNS publish error. " +
+                       "attempt_number=#{attempt_number} " +
                        "error_class=#{e.class.inspect} " +
                        "error_message=#{e.message.inspect}"
         end

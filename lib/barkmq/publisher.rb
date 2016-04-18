@@ -37,15 +37,8 @@ module BarkMQ
       def publish_to_sns topic, options={}
         topic_name = full_topic(topic)
         obj = serialized_object(options)
-        BarkMQ.publish(topic_name, obj, async: true, timeout: 30)
-      rescue Aws::SNS::Errors::NotFound => e
-        BarkMQ.pub_config.logger.error "SNS topic not found topic_name=#{topic_name.inspect}"
-        BarkMQ.pub_config.statsd.event("SNS topic not found.",
-                                       "topic_name=#{topic_name}\n",
-                                       alert_type: 'error',
-                                       tags: [ "category:message_queue" ])
+        BarkMQ.publish(topic_name, obj)
       end
-
     end
   end
 end

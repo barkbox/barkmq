@@ -13,11 +13,8 @@ module BarkMQ
 
     PUBLISH_TIMEOUT = 30
 
-    def get_topic topic_name
-      Shoryuken::Client.sns.create_topic(name: topic_name)
-    end
-
-    def _publish topic_arn, message
+    def _publish topic_name, message
+      topic_arn = Shoryuken::Client.sns.create_topic(name: topic_name).topic_arn
       Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
     end
 
@@ -36,8 +33,7 @@ module BarkMQ
                                      rescue: CONNECTION_ERRORS,
                                      base_sleep_seconds: 0.05,
                                      max_sleep_seconds: 0.25) do
-            topic_arn = get_topic(topic_name).topic_arn
-            _publish(topic_arn, message)
+            _publish(topic_name, message)
           end
         end
       rescue => e

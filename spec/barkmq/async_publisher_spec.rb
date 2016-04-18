@@ -18,13 +18,8 @@ RSpec.describe BarkMQ::AsyncPublisher do
       subject.publish(topic_name, message, options)
     end
 
-    it 'calls get_topic' do
-      expect(subject.wrapped_object).to receive(:get_topic).with(topic_name).and_call_original
-      publish
-    end
-
     it 'calls _publish' do
-      expect(subject.wrapped_object).to receive(:_publish).with('arn:aws:sns:us-east-1:884430715628:test_topic', message.to_json).and_call_original
+      expect(subject.wrapped_object).to receive(:_publish).with(topic_name, message.to_json).and_call_original
       publish
     end
 

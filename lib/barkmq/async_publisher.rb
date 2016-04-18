@@ -17,6 +17,10 @@ module BarkMQ
       Shoryuken::Client.sns.create_topic(name: topic_name)
     end
 
+    def _publish topic_arn, message
+      Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
+    end
+
     def publish(topic_name, message, options={})
       begin
         @timer = after(options[:timeout] || PUBLISH_TIMEOUT) { timeout(topic_name) }
@@ -28,9 +32,12 @@ module BarkMQ
                        "error_message=#{e.message.inspect}"
         end
         middleware.call(topic_name, message) do
-          with_retries(max_tries: 3, handler: handler, rescue: CONNECTION_ERRORS, base_sleep_seconds: 0.05, max_sleep_seconds: 0.25) do
+          with_retries(max_tries: 3, handler: handler,
+                                     rescue: CONNECTION_ERRORS,
+                                     base_sleep_seconds: 0.05,
+                                     max_sleep_seconds: 0.25) do
             topic_arn = get_topic(topic_name).topic_arn
-            Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
+            _publish(topic_arn, message)
           end
         end
       rescue => e

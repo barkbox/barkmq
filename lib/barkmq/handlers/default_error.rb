@@ -9,17 +9,19 @@ module BarkMQ
         self.statsd = statsd
       end
 
-      def call error
-        logger.error "BarkMQ #{namespace} error=#{error.inspect}"
-        statsd.increment("barkmq.message.#{namespace}.error", tags: [ "category:#{namespace}" ])
-        statsd.event("BarkMQ #{namespace} error.",
+      def call topic_name, error
+        logger.error "BarkMQ error. namespace=#{namespace.inspect} " +
+                     "topic_name=#{topic_name.inspect} " +
+                     "error=#{error.inspect}"
+        statsd.increment("barkmq.message.#{namespace}.error", tags: [ "topic_name:#{topic_name}" ])
+        statsd.event("BarkMQ error. namespace=#{namespace.inspect}",
                      "error=#{error.inspect}\n",
                      alert_type: 'error',
-                     tags: [ "category:#{namespace}" ])
-        Circuitry.flush if namespace == 'publisher'
+                     tags: [ "topic_name:#{topic_name}" ])
       end
 
       private
+
       attr_writer :namespace, :logger, :statsd
 
     end

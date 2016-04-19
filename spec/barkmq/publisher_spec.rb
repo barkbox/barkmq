@@ -53,7 +53,7 @@ RSpec.describe BarkMQ::Publisher do
         end
       end
       @publisher = NewPublisher.new
-      expect(BarkMQ).to receive(:publish).with('test-barkmq-tested', { id: 1, message: 'test' }, anything)
+      expect(BarkMQ).to receive(:publish).with('test-barkmq-tested', { id: 1, message: 'test' })
       @publisher.publish_to_sns('tested')
     end
   end

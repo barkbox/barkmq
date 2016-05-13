@@ -17,8 +17,8 @@ module BarkMQ
         base.attribute :error_handler
       end
 
-      def add_topic(topic)
-        full_topic = [topic_namespace, topic].flatten.compact.join('-')
+      def add_topic(topic, options={})
+        full_topic = [ (options[:namespace] || topic_namespace), topic].flatten.compact.join('-')
         unless topic_names.include?(full_topic)
           topic_names << full_topic
         end

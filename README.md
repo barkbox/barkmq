@@ -115,3 +115,8 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/barkbox/barkmq.
+
+## Publishing new gem version
+* bump version
+* commit to master
+* `gem_push=no rake release`

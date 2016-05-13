@@ -25,7 +25,7 @@ module BarkMQ
       end
 
       def add_handler handler_class, options={}
-        topic_name = [ self.topic_namespace, options[:topic].to_s ].compact.join('-')
+        topic_name = [ (options[:namespace] || self.topic_namespace), options[:topic].to_s ].compact.join('-')
         handlers[topic_name] = handler_class
       end
     end

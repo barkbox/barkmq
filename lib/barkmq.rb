@@ -1,6 +1,7 @@
 require 'circuitry'
 require 'shoryuken'
 require 'celluloid'
+require 'sidekiq'
 require 'celluloid/current'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'

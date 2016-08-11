@@ -37,7 +37,8 @@ module BarkMQ
       def publish_to_sns topic, options={}
         topic_name = full_topic(topic)
         message = serialized_object(options)
-        BarkMQ.publish(topic_name, message, { sync: options[:sync] || false })
+        options[:sync] = true if options[:sync].nil?
+        BarkMQ.publish(topic_name, message, { sync: options[:sync] })
       end
     end
   end

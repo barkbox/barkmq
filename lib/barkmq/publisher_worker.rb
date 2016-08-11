@@ -1,26 +1,24 @@
 require 'retries'
 
 module BarkMQ
-  class PublishTimeout < StandardError; end
 
-  class AsyncPublisher
-    include Celluloid
+  class PublisherWorker
+    include Sidekiq::Worker
+    sidekiq_options queue: 'barkmq_publisher',
+                    retry: 3
 
     CONNECTION_ERRORS = [
       ::Seahorse::Client::NetworkingError,
       ::Aws::SNS::Errors::InternalFailure
     ].freeze
 
-    PUBLISH_TIMEOUT = 30
-
     def _publish topic_name, message
       topic_arn = Shoryuken::Client.sns.create_topic(name: topic_name).topic_arn
       Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
     end
 
-    def publish(topic_name, message, options={})
+    def perform(topic_name, message, options={})
       begin
-        @timer = after(options[:timeout] || PUBLISH_TIMEOUT) { timeout(topic_name) }
         handler = -> (e, attempt_number, _total_delay) do
           logger.error "SNS publish error. " +
                        "attempt_number=#{attempt_number} " +
@@ -38,7 +36,6 @@ module BarkMQ
       rescue => e
         error_handler.call(topic_name, e)
       ensure
-        @timer.cancel if @timer
         ActiveRecord::Base.connection.close
       end
     end
@@ -61,9 +58,5 @@ module BarkMQ
       BarkMQ.publisher_config.middleware
     end
 
-    def timeout topic_name
-      @timer.cancel if @timer
-      error_handler.call(topic_name, PublishTimeout)
-    end
   end
 end

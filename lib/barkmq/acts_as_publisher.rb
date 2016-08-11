@@ -78,7 +78,7 @@ module BarkMQ
       def after_create_publish
         begin
           topic = self.publish_topics[:create]
-          self.publish_to_sns(topic)
+          self.publish_to_sns(topic, { sync: true })
           self.run_publish_callbacks(:after_publish_on_create)
         rescue => e
           self.run_publish_callbacks(:after_publish_on_error, e)
@@ -90,7 +90,7 @@ module BarkMQ
       def after_update_publish
         begin
           topic = self.publish_topics[:update]
-          self.publish_to_sns(topic)
+          self.publish_to_sns(topic, { sync: true })
           self.run_publish_callbacks(:after_publish_on_update)
         rescue => e
           self.run_publish_callbacks(:after_publish_on_error, e)
@@ -102,7 +102,7 @@ module BarkMQ
       def after_destroy_publish
         begin
           topic = self.publish_topics[:destroy]
-          self.publish_to_sns(topic)
+          self.publish_to_sns(topic, { sync: true })
           self.run_publish_callbacks(:after_publish_on_destroy)
         rescue => e
           self.run_publish_callbacks(:after_publish_on_error, e)

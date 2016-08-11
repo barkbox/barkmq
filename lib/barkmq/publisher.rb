@@ -28,16 +28,16 @@ module BarkMQ
 
       def serialized_object options={}
         if self.class.message_serializer.present?
-          self.class.message_serializer.new(self)
+          self.class.message_serializer.new(self).to_json
         else
-          self.serializable_hash.merge(options)
+          self.serializable_hash.merge(options).to_json
         end
       end
 
       def publish_to_sns topic, options={}
         topic_name = full_topic(topic)
-        obj = serialized_object(options)
-        BarkMQ.publish(topic_name, obj)
+        message = serialized_object(options)
+        BarkMQ.publish(topic_name, message, { sync: options[:sync] || false })
       end
     end
   end

@@ -32,6 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "shoryuken", "~> 2.0.4"
   spec.add_dependency "celluloid", "~> 0.17.3"
   spec.add_dependency "retries", "~> 0.0.5"
+  spec.add_dependency "sidekiq", "~> 3.2.1"
 
   spec.add_development_dependency "bundler", "~> 1.9"
   spec.add_development_dependency "rake", "~> 10.0"

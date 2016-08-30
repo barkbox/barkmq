@@ -19,12 +19,7 @@ RSpec.describe BarkMQ::AsyncPublisher do
     end
 
     it 'calls _publish' do
-      expect(subject.wrapped_object).to receive(:_publish).with(topic_name, message.to_json).and_call_original
-      publish
-    end
-
-    it 'serializes message' do
-      expect(message).to receive(:to_json).and_call_original
+      expect(subject.wrapped_object).to receive(:_publish).with(topic_name, message).and_call_original
       publish
     end
 

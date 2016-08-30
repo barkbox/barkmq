@@ -1,6 +1,7 @@
 require 'circuitry'
 require 'shoryuken'
 require 'celluloid'
+require 'sidekiq'
 require 'celluloid/current'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
 require 'barkmq/config/subscriber'
@@ -12,6 +13,7 @@ require 'barkmq/subscriber'
 require 'barkmq/publisher'
 require 'barkmq/acts_as_publisher'
 require 'barkmq/async_publisher'
+require 'barkmq/publisher_worker'
 require 'barkmq/frameworks/active_record' if defined?(ActiveRecord)
 require 'barkmq/version'
 
@@ -74,7 +76,11 @@ module BarkMQ
     end
 
     def publish(topic_name, object, options={})
-      Celluloid::Actor[:publisher].async.publish(topic_name, object, options)
+      if options[:sync] == true
+        BarkMQ::PublisherWorker.perform_async(topic_name, object, options)
+      else
+        Celluloid::Actor[:publisher].async.publish(topic_name, object, options)
+      end
     end
 
   end

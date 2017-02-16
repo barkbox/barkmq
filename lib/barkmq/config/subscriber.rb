@@ -26,6 +26,7 @@ module BarkMQ
 
       def add_handler handler_class, options={}
         topic_name = [ (options[:namespace] || self.topic_namespace), options[:topic].to_s ].compact.join('-')
+        BarkMQ.sub_config.logger.info "add_handler: handler_class=#{handler_class.inspect} topic_name=#{topic_name.inspect}"
         handlers[topic_name] = handler_class
       end
     end

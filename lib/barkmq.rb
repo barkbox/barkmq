@@ -68,6 +68,7 @@ module BarkMQ
     end
 
     def handle_message topic_name, message
+      BarkMQ.sub_config.logger.info "handle_message: topic_name=#{topic_name} message=#{message.inspect}"
       if @_sub_config.handlers[topic_name.to_s]
         @_sub_config.handlers[topic_name.to_s].new.perform(topic_name, message)
       else

@@ -72,6 +72,11 @@ class User < ActiveRecord::Base
   end
 end
 ```
+
+Ensure that sidekiq is running for publishing.
+
+Make sure to include in your sidekiq queue the following queue *barkmq_publisher*
+
 [Full Publisher Details](docs/publisher.md)
 
 ### Subscriber

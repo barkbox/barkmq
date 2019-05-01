@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "virtus", "~> 1.0"
   spec.add_dependency "circuitry", "~> 3.1.3"
-  spec.add_dependency "dogstatsd-ruby", "~> 1.6.0"
+  spec.add_dependency "dogstatsd-ruby", ">= 1.6.0"
   spec.add_dependency "shoryuken", "~> 2.0.4"
   spec.add_dependency "celluloid", "~> 0.17.3"
   spec.add_dependency "retries", "~> 0.0.5"

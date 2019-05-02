@@ -1,6 +1,7 @@
-require 'statsd'
+require 'datadog/statsd'
 
 module BarkMQ
+  Statsd = Datadog::Statsd
   class ConfigError < StandardError; end
 
   module Config

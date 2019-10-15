@@ -3,7 +3,7 @@ A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application's(barkbox-rails) Gemfile:
 
 ```ruby
 gem 'barkmq'

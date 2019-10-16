@@ -15,6 +15,7 @@ module BarkMQ
         base.attribute :topic_names, Array, default: []
         base.attribute :statsd, Statsd, default: Statsd.new
         base.attribute :error_handler
+        base.attribute :topic_arns, Hash, default: {}
       end
 
       def add_topic(topic, options={})
@@ -22,6 +23,10 @@ module BarkMQ
         unless topic_names.include?(full_topic)
           topic_names << full_topic
         end
+      end
+
+      def fetch_topic_arn(topic_name)
+        topic_arns[topic_name] ||= Shoryuken::Client.sns.create_topic(name: topic_name).topic_arn
       end
     end
 

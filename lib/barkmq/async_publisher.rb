@@ -13,11 +13,6 @@ module BarkMQ
 
     PUBLISH_TIMEOUT = 30
 
-    def _publish topic_name, message
-      topic_arn = Shoryuken::Client.sns.create_topic(name: topic_name).topic_arn
-      Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
-    end
-
     def publish(topic_name, message, options={})
       begin
         @timer = after(options[:timeout] || PUBLISH_TIMEOUT) { timeout(topic_name) }
@@ -32,7 +27,7 @@ module BarkMQ
                                      rescue: CONNECTION_ERRORS,
                                      base_sleep_seconds: 0.05,
                                      max_sleep_seconds: 0.25) do
-            _publish(topic_name, message)
+            publisher.publish(topic_name, message)
           end
         end
       rescue => e
@@ -44,6 +39,10 @@ module BarkMQ
     end
 
     private
+
+    def publisher
+      BarkMQ::Publisher
+    end
 
     def logger
       BarkMQ.publisher_config.logger

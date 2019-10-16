@@ -8,6 +8,21 @@ RSpec.describe BarkMQ::Publisher do
     end
   end
 
+  describe '.publish' do
+    let(:topic_name) { 'queue-name-1' }
+    let(:topic_arn) { 'queue-name-1-arn' }
+    let(:message) { 'example-message' }
+
+    it 'should handle publish to sns by using topic name and message' do
+      expect(Shoryuken::Client.sns).to receive(:create_topic).and_return(
+        double('topic_arn', topic_arn: topic_arn))
+      expect(Shoryuken::Client.sns).to receive(:publish).with(
+        topic_arn: topic_arn, message: message)
+
+      BarkMQ::Publisher.publish(topic_name, message)
+    end
+  end
+
   describe '.model_name' do
     it 'PORO with no options' do
       class NewPublisher
@@ -36,6 +51,7 @@ RSpec.describe BarkMQ::Publisher do
 
     it 'ActiveRecord with no options' do
       class NewArPublisher < ActiveRecord::Base
+        acts_as_publisher
       end
       @publisher = NewArPublisher.new
       expect(@publisher.publish_topics[:create]).to eq('new_ar_publisher-created')

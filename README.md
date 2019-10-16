@@ -1,3 +1,7 @@
+# BE AWARE 
+
+![screen][screen-upwork.png]
+
 # BarkMQ
 A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
 

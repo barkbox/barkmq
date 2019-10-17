@@ -12,11 +12,6 @@ module BarkMQ
       ::Aws::SNS::Errors::InternalFailure
     ].freeze
 
-    def _publish topic_name, message
-      topic_arn = Shoryuken::Client.sns.create_topic(name: topic_name).topic_arn
-      Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
-    end
-
     def perform(topic_name, message, options={})
       begin
         handler = -> (e, attempt_number, _total_delay) do
@@ -30,7 +25,7 @@ module BarkMQ
                                      rescue: CONNECTION_ERRORS,
                                      base_sleep_seconds: 0.05,
                                      max_sleep_seconds: 0.25) do
-            _publish(topic_name, message)
+            BarkMQ::Publisher.publish(topic_name, message)
           end
         end
       rescue => e
@@ -41,6 +36,10 @@ module BarkMQ
     end
 
     private
+
+    def publisher
+      BarkMQ::Publisher
+    end
 
     def logger
       BarkMQ.publisher_config.logger

@@ -18,8 +18,8 @@ RSpec.describe BarkMQ::AsyncPublisher do
       subject.publish(topic_name, message, options)
     end
 
-    it 'calls _publish' do
-      expect(subject.wrapped_object).to receive(:_publish).with(topic_name, message).and_call_original
+    it 'calls publisher.publish' do
+      expect(subject.wrapped_object).to receive_message_chain(:publisher, :publish).with(topic_name, message)
       publish
     end
 
@@ -29,9 +29,14 @@ RSpec.describe BarkMQ::AsyncPublisher do
     end
 
     it 'calls error handler' do
-      subject.wrapped_object.instance_eval do
-        def _publish topic_arn, message
+      class PublisherTestKlass
+        def self.publish topic_arn, message
           raise 'test'
+        end
+      end
+      subject.wrapped_object.instance_eval do
+        def publisher
+          PublisherTestKlass
         end
       end
       expect(subject.wrapped_object).to receive_message_chain(:error_handler, :call).with(topic_name, RuntimeError)
@@ -39,22 +44,33 @@ RSpec.describe BarkMQ::AsyncPublisher do
     end
 
     it 'calls timeout error' do
-      subject.wrapped_object.instance_eval do
-        def _publish topic_arn, message
+      class PublisherTestKlass
+        def self.publish topic_arn, message
           sleep(2)
         end
       end
-      expect(subject.wrapped_object).to receive_message_chain(:error_handler, :call).with(topic_name, BarkMQ::PublishTimeout)
+      subject.wrapped_object.instance_eval do
+        def publisher
+          PublisherTestKlass
+        end
+      end
+      expect(subject.wrapped_object).to receive_message_chain(:error_handler, :call).
+        with(topic_name, BarkMQ::PublishTimeout)
       publish({ timeout: 1 })
     end
 
     it 'retries connection error' do
-      subject.wrapped_object.instance_eval do
-        def _publish topic_arn, message
+      class PublisherTestKlass
+        def self.publish topic_arn, message
           raise ::Aws::SNS::Errors::InternalFailure.new('test', 'error')
         end
       end
-      expect(subject.wrapped_object).to receive(:_publish).and_call_original.exactly(3).times
+      subject.wrapped_object.instance_eval do
+        def publisher
+          PublisherTestKlass
+        end
+      end
+      expect(PublisherTestKlass).to receive(:publish).and_call_original.exactly(3).times
       publish
     end
   end

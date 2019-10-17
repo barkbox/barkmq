@@ -8,6 +8,8 @@ and then as interview questions via teamviewer asked:
 - to improve performance `create_topic` places
 - reduce size for internal bark-rails app
 
+then he submitted as his changes to the repo that looked weird and asked about it
+
 # BarkMQ
 A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
 

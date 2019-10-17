@@ -2,6 +2,12 @@
 
 ![screen](screen-upwork.png)
 
+@sargilhbark removed by comments but he created the job offer in upwork
+and then as interview questions via teamviewer asked:
+
+- to improve performance `create_topic` places
+- reduce size for internal bark-rails app
+
 # BarkMQ
 A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
 

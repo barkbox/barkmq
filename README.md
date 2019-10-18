@@ -1,14 +1,16 @@
-# BE AWARE 
+# BE AWARE
 
-![screen](screen-upwork.png)
+![screen](https://ibb.co/3z2YPkx)
 
-@sargilhbark removed by comments but he created the job offer in upwork
+@sargilhbark/@barkshass (iori5player@yahoo.com) removed my comments but he created the job offer in upwork
 and then as interview questions via teamviewer asked:
 
 - to improve performance `create_topic` places
 - reduce size for internal bark-rails app
 
-then he submitted as his changes to the repo that looked weird and asked about it
+then he submitted my changes as his pull request to the repo that looked weird and asked about it
+
+[explanation](https://dev.to/oivoodoo/story-about-the-clients-in-upwork-31ei)
 
 # BarkMQ
 A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.

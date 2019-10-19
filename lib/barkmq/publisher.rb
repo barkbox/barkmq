@@ -5,6 +5,11 @@ module BarkMQ
       base.send :include, InstanceMethods
     end
 
+    def self.publish topic_name, message
+      topic_arn = BarkMQ.publisher_config.fetch_topic_arn(topic_name)
+      Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
+    end
+
     module ClassMethods
       attr_accessor :message_serializer
     end

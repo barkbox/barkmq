@@ -38,6 +38,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "redis"
+  spec.add_development_dependency "mock_redis"
+  spec.add_development_dependency "pry"
   spec.add_development_dependency "activerecord", "~> 3.0"
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "coveralls"

@@ -76,8 +76,11 @@ module BarkMQ
       end
 
       def after_create_publish
+        binding.pry
         begin
+          binding.pry
           topic = self.publish_topics[:create]
+          binding.pry
           self.publish_to_sns(topic, { sync: true })
           self.run_publish_callbacks(:after_publish_on_create)
         rescue => e

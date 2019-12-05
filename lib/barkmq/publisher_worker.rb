@@ -28,7 +28,14 @@ module BarkMQ
             BarkMQ::Publisher.publish(topic_name, message)
           end
         end
-      rescue => e
+      rescue ::Aws::Errors::ServiceError => e
+        if e.code == '404'
+          BarkMQ.publisher_config.topic_arn_cache.bust
+          perform(topic_name, message, options)
+        else
+          error_handler.call(topic_name, e)
+        end
+      rescue StandardError => e
         error_handler.call(topic_name, e)
       ensure
         ActiveRecord::Base.connection.close
@@ -47,6 +54,10 @@ module BarkMQ
 
     def statsd
       BarkMQ.publisher_config.statsd
+    end
+
+    def topic_arn_cache
+      BarkMQ.publisher_config.topic_arn_cache
     end
 
     def error_handler

@@ -4,6 +4,7 @@ require 'celluloid'
 require 'sidekiq'
 require 'celluloid/current'
 require 'barkmq/railtie' if defined?(Rails) && Rails::VERSION::MAJOR >= 3
+require 'barkmq/cache'
 require 'barkmq/config/subscriber'
 require 'barkmq/config/publisher'
 require 'barkmq/handlers/default_error'
@@ -77,7 +78,7 @@ module BarkMQ
 
     def publish(topic_name, object, options={})
       if options[:sync] == true
-        BarkMQ::PublisherWorker.perform_async(topic_name, object, options)
+        BarkMQ::PublisherWorker.perform(topic_name, object, options)
       else
         Celluloid::Actor[:publisher].async.publish(topic_name, object, options)
       end

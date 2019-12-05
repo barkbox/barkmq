@@ -5,6 +5,8 @@ RSpec.describe BarkMQ::Publisher do
   before do
     BarkMQ.publisher_config do |c|
       c.topic_namespace = 'test-barkmq'
+      c.redis = MockRedis.new
+      c.topic_arn_cache_key = 'barkmq'
     end
   end
 
@@ -13,13 +15,15 @@ RSpec.describe BarkMQ::Publisher do
     let(:topic_arn) { 'queue-name-1-arn' }
     let(:message) { 'example-message' }
 
-    it 'should handle publish to sns by using topic name and message' do
+    it 'should handle publish to sns by using topic name and message, and cache the topic arn' do
       expect(Shoryuken::Client.sns).to receive(:create_topic).and_return(
         double('topic_arn', topic_arn: topic_arn))
       expect(Shoryuken::Client.sns).to receive(:publish).with(
         topic_arn: topic_arn, message: message)
 
       BarkMQ::Publisher.publish(topic_name, message)
+
+      expect(BarkMQ.publisher_config.redis.hget('barkmq', topic_name)).to eq(topic_arn)
     end
   end
 

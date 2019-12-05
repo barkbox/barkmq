@@ -27,7 +27,7 @@ module BarkMQ
                                      rescue: CONNECTION_ERRORS,
                                      base_sleep_seconds: 0.05,
                                      max_sleep_seconds: 0.25) do
-            publisher.publish(topic_name, message)
+            publisher.publish_async(topic_name, message)
           end
         end
       rescue => e

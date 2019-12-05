@@ -5,7 +5,9 @@ require 'celluloid'
 require 'barkmq'
 require 'circuitry/testing'
 require 'redis'
+require 'mock_redis'
 require 'coveralls'
+require 'pry'
 
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3',
                                         database: File.dirname(__FILE__) + "/db.sqlite3")

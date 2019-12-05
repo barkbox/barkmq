@@ -6,7 +6,7 @@ module BarkMQ
     end
 
     def self.publish topic_name, message
-      topic_arn = BarkMQ.publisher_config.fetch_topic_arn(topic_name)
+      topic_arn = BarkMQ.publisher_config.get_topic_arn(topic_name)
       Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
     end
 

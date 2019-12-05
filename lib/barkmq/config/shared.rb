@@ -24,10 +24,6 @@ module BarkMQ
           topic_names << full_topic
         end
       end
-
-      def fetch_topic_arn(topic_name)
-        topic_arns[topic_name] ||= Shoryuken::Client.sns.create_topic(name: topic_name).topic_arn
-      end
     end
 
   end

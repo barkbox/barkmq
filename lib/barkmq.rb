@@ -78,7 +78,7 @@ module BarkMQ
 
     def publish(topic_name, object, options={})
       if options[:sync] == true
-        BarkMQ::PublisherWorker.perform(topic_name, object, options)
+        BarkMQ::PublisherWorker.new.perform(topic_name, object, options)
       else
         Celluloid::Actor[:publisher].async.publish(topic_name, object, options)
       end

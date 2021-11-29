@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe BarkMQ::Handlers::DefaultError do
   subject { described_class.new(options) }
 
-  let(:statsd) { Statsd.new }
+  let(:statsd) { Datadog::Statsd.new }
 
   describe '#call' do
     def call

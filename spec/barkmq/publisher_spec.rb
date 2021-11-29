@@ -21,7 +21,7 @@ RSpec.describe BarkMQ::Publisher do
       class NewArPublisher < ActiveRecord::Base
       end
       @publisher = NewArPublisher.new
-      expect(@publisher.model_name).to eq('new_ar_publisher')
+      expect(@publisher.model_name.param_key).to eq('new_ar_publisher')
     end
   end
 

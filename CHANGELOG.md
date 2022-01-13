@@ -1,4 +1,4 @@
-# 1.0-rc1
+# 1.0.0
 - Configure CircleCI to run specs
 - Fix specs
   - `Statsd.new` -> `Datadog::Statsd.new`

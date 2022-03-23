@@ -83,5 +83,9 @@ module BarkMQ
       end
     end
 
+    def sns_client
+      @sns_client ||= AWS::SNS::Client.new
+    end
+
   end
 end

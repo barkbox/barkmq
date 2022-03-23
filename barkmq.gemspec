@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "dogstatsd-ruby", "~> 3.3.0"
   spec.add_dependency "shoryuken", "< 6"
   spec.add_dependency "aws-sdk-sqs"
+  spec.add_dependency "aws-sdk-sns"
   spec.add_dependency "celluloid", "~> 0.17.3"
   spec.add_dependency "retries", "~> 0.0.5"
   spec.add_dependency "sidekiq", "< 6"

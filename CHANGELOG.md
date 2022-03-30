@@ -1,3 +1,6 @@
+# 1.0.1
+- Fix bug caused by Shoryuken update
+
 # 1.0.0
 - Configure CircleCI to run specs
 - Fix specs

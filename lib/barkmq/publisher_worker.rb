@@ -13,8 +13,8 @@ module BarkMQ
     ].freeze
 
     def _publish topic_name, message
-      topic_arn = Shoryuken::Client.sns.create_topic(name: topic_name).topic_arn
-      Shoryuken::Client.sns.publish(topic_arn: topic_arn, message: message)
+      topic_arn = BarkMQ.sns_client.create_topic(name: topic_name).topic_arn
+      BarkMQ.sns_client.publish(topic_arn: topic_arn, message: message)
     end
 
     def perform(topic_name, message, options={})

@@ -16,7 +16,7 @@ require 'barkmq/async_publisher'
 require 'barkmq/publisher_worker'
 require 'barkmq/frameworks/active_record' if defined?(ActiveRecord)
 require 'barkmq/version'
-
+require 'aws'
 module BarkMQ
   class HandlerNotFound < StandardError; end
 
@@ -84,7 +84,7 @@ module BarkMQ
     end
 
     def sns_client
-      @sns_client ||= AWS::SNS::Client.new
+      @sns_client ||= Aws::SNS::Client.new
     end
 
   end

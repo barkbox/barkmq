@@ -8,20 +8,21 @@ RSpec.describe BarkMQ::Publisher do
     end
   end
 
-  describe '.model_name' do
+  describe '.bark_mq_model_name' do
     it 'PORO with no options' do
       class NewPublisher
         include BarkMQ::Publisher
       end
-      @publisher = NewPublisher.new
-      expect(@publisher.model_name).to eq(nil)
+      publisher = NewPublisher.new
+      expect(publisher.bark_mq_model_name).to eq(nil)
     end
 
     it 'ActiveRecord with no options' do
       class NewArPublisher < ActiveRecord::Base
+        include BarkMQ::Publisher
       end
-      @publisher = NewArPublisher.new
-      expect(@publisher.model_name).to eq('new_ar_publisher')
+      publisher = NewArPublisher.new
+      expect(publisher.bark_mq_model_name).to eq('new_ar_publisher')
     end
   end
 
@@ -30,16 +31,16 @@ RSpec.describe BarkMQ::Publisher do
       class NewPublisher
         include BarkMQ::Publisher
       end
-      @publisher = NewPublisher.new
-      expect(@publisher.full_topic('created')).to eq('test-barkmq-created')
+      publisher = NewPublisher.new
+      expect(publisher.full_topic('created')).to eq('test-barkmq-created')
     end
 
     it 'ActiveRecord with no options' do
       class NewArPublisher < ActiveRecord::Base
       end
-      @publisher = NewArPublisher.new
-      expect(@publisher.publish_topics[:create]).to eq('new_ar_publisher-created')
-      expect(@publisher.full_topic(@publisher.publish_topics[:create])).to eq('test-barkmq-new_ar_publisher-created')
+      publisher = NewArPublisher.new
+      expect(publisher.publish_topics[:create]).to eq('new_ar_publisher-created')
+      expect(publisher.full_topic(publisher.publish_topics[:create])).to eq('test-barkmq-new_ar_publisher-created')
     end
   end
 
@@ -52,9 +53,9 @@ RSpec.describe BarkMQ::Publisher do
           { id: 1, message: 'test' }
         end
       end
-      @publisher = NewPublisher.new
+      publisher = NewPublisher.new
       expect(BarkMQ).to receive(:publish).with('test-barkmq-tested', { id: 1, message: 'test' }.to_json, { sync: true })
-      @publisher.publish_to_sns('tested')
+      publisher.publish_to_sns('tested')
     end
   end
 

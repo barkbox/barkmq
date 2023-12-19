@@ -10,8 +10,7 @@ module BarkMQ
     end
 
     module InstanceMethods
-
-      def model_name
+      def bark_mq_model_name
         if self.class.ancestors.include?(ActiveRecord::Base)
           self.class.model_name.param_key
         else

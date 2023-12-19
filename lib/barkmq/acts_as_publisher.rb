@@ -18,9 +18,9 @@ module BarkMQ
         options[:on] ||= [ :create, :update, :destroy ]
         options[:on] = Array(options[:on])
 
-        options[:create_topic] ||= [ self.model_name.param_key, 'created' ].join('-')
-        options[:update_topic] ||= [ self.model_name.param_key, 'updated' ].join('-')
-        options[:destroy_topic] ||= [ self.model_name.param_key, 'destroyed' ].join('-')
+        options[:create_topic] ||= [ self.bark_mq_model_name, 'created' ].join('-')
+        options[:update_topic] ||= [ self.bark_mq_model_name, 'updated' ].join('-')
+        options[:destroy_topic] ||= [ self.bark_mq_model_name, 'destroyed' ].join('-')
 
         self.publish_topics[:create] ||= options[:create_topic]
         self.publish_topics[:update] ||= options[:update_topic]

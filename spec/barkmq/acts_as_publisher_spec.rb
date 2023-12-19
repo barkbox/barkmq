@@ -87,6 +87,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       @publisher_record = NewArPublisher.new
       expect(@publisher_record).to receive(:after_create_publish).and_call_original
       expect(@publisher_record).to receive(:publish_to_sns)
+      expect(@publisher_record).to receive(:run_publish_callbacks).with(:after_publish_on_complete)
       expect(@publisher_record).to receive(:run_publish_callbacks).with(:after_publish_on_create)
       @publisher_record.save!
     end
@@ -102,6 +103,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       @publisher_record = NewArPublisher.create!
       expect(@publisher_record).to receive(:after_update_publish).and_call_original
       expect(@publisher_record).to receive(:publish_to_sns)
+      expect(@publisher_record).to receive(:run_publish_callbacks).with(:after_publish_on_complete)
       expect(@publisher_record).to receive(:run_publish_callbacks).with(:after_publish_on_update)
       @publisher_record.event = 'update'
       @publisher_record.save!
@@ -118,6 +120,7 @@ RSpec.describe BarkMQ::ActsAsPublisher do
       @publisher_record = NewArPublisher.create!
       expect(@publisher_record).to receive(:after_destroy_publish).and_call_original
       expect(@publisher_record).to receive(:publish_to_sns)
+      expect(@publisher_record).to receive(:run_publish_callbacks).with(:after_publish_on_complete)
       expect(@publisher_record).to receive(:run_publish_callbacks).with(:after_publish_on_destroy)
       @publisher_record.destroy
     end

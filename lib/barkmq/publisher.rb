@@ -7,15 +7,19 @@ module BarkMQ
 
     module ClassMethods
       attr_accessor :message_serializer
+
+      def bark_mq_model_name
+        if ancestors.include?(ActiveRecord::Base)
+          model_name.param_key
+        else
+          nil
+        end
+      end
     end
 
     module InstanceMethods
       def bark_mq_model_name
-        if self.class.ancestors.include?(ActiveRecord::Base)
-          self.class.model_name.param_key
-        else
-          nil
-        end
+        self.class.bark_mq_model_name
       end
 
       def full_topic topic

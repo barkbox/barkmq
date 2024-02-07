@@ -1,4 +1,5 @@
 # BarkMQ
+
 A Pub/Sub gem with an opinionated set of defaults for BarkCo projects.
 
 ## Installation
